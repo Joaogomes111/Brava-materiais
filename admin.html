@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Painel Administrativo | Brava Materiais de Limpeza</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="assets/brava-logo.png">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="admin-body">
+    <div class="login-screen" data-login-screen>
+      <form class="login-card" data-login-form>
+        <img src="assets/brava-logo.png" alt="Brava Materiais de Limpeza">
+        <h1 style="font-size: 2rem;">Painel administrativo</h1>
+        <p class="lead" style="font-size: 1rem;">Entre para testar o gerenciamento do catalogo.</p>
+        <div class="form-grid">
+          <label>
+            E-mail
+            <input class="field" type="email" value="admin@brava.local" data-login-email required>
+          </label>
+          <label>
+            Senha
+            <input class="field" type="password" value="brava123" data-login-password required>
+          </label>
+          <button class="button" type="submit">Entrar no painel</button>
+        </div>
+        <p style="color: var(--muted); font-size: 0.88rem; margin-top: 16px;">
+          Esta primeira versao usa login demonstrativo. No Supabase, o login real sera por usuario e senha cadastrados.
+        </p>
+      </form>
+    </div>
+
+    <div class="admin-shell hidden" data-admin-shell>
+      <aside class="admin-sidebar">
+        <img src="assets/brava-logo.png" alt="Brava Materiais de Limpeza">
+        <nav class="admin-nav" aria-label="Menu do painel">
+          <button type="button" class="active" data-admin-tab="products">Produtos</button>
+          <button type="button" data-admin-tab="categories">Categorias</button>
+          <button type="button" data-admin-tab="banners">Banners</button>
+          <button type="button" data-admin-tab="company">Empresa</button>
+          <a class="admin-link" href="index.html">Ver site</a>
+        </nav>
+      </aside>
+
+      <main class="admin-main">
+        <div class="admin-top">
+          <div>
+            <div class="eyebrow">Brava Catalogo</div>
+            <h2>Painel simples</h2>
+            <p class="lead">Cadastre produtos, organize categorias, edite banners e ajuste dados da empresa.</p>
+          </div>
+          <div class="hero-actions">
+            <button class="button secondary" type="button" data-reset-demo>Restaurar dados</button>
+            <button class="button" type="button" data-logout>Sair</button>
+          </div>
+        </div>
+
+        <div class="notice">
+          Modo demonstracao: as alteracoes ficam salvas neste navegador. Depois de conectar o Supabase, estes formularios passam a salvar no banco online.
+        </div>
+
+        <section class="admin-panel active" data-panel="products">
+          <div class="admin-grid">
+            <form class="admin-card form-grid" data-product-form>
+              <input type="hidden" data-product-id>
+              <h3>Novo produto</h3>
+              <label>
+                Nome do produto
+                <input class="field" data-product-name required>
+              </label>
+              <div class="form-inline">
+                <label>
+                  Codigo
+                  <input class="field" data-product-code placeholder="Opcional">
+                </label>
+                <label>
+                  Preco
+                  <input class="field" data-product-price placeholder="Sob consulta">
+                </label>
+              </div>
+              <label>
+                Categoria
+                <select class="select" data-product-category required></select>
+              </label>
+              <label>
+                URL da imagem
+                <input class="field" data-product-image placeholder="https://...">
+              </label>
+              <label>
+                Trocar imagem pelo computador
+                <input class="field" type="file" accept="image/*" data-product-file>
+              </label>
+              <label>
+                Descricao
+                <textarea class="textarea" data-product-description required></textarea>
+              </label>
+              <label class="check-row">
+                <input type="checkbox" data-product-featured>
+                Produto em destaque
+              </label>
+              <label class="check-row">
+                <input type="checkbox" data-product-active checked>
+                Produto ativo no site
+              </label>
+              <button class="button" type="submit">Salvar produto</button>
+              <button class="button secondary" type="button" data-product-clear>Limpar formulario</button>
+            </form>
+
+            <div class="admin-card">
+              <h3>Produtos cadastrados</h3>
+              <div class="admin-list" data-product-list></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-panel" data-panel="categories">
+          <div class="admin-grid">
+            <form class="admin-card form-grid" data-category-form>
+              <input type="hidden" data-category-id>
+              <h3>Categoria</h3>
+              <label>
+                Nome
+                <input class="field" data-category-name required>
+              </label>
+              <label>
+                Imagem
+                <input class="field" data-category-image placeholder="https://...">
+              </label>
+              <label>
+                Descricao
+                <textarea class="textarea" data-category-description required></textarea>
+              </label>
+              <button class="button" type="submit">Salvar categoria</button>
+              <button class="button secondary" type="button" data-category-clear>Limpar formulario</button>
+            </form>
+
+            <div class="admin-card">
+              <h3>Categorias cadastradas</h3>
+              <div class="admin-list" data-category-list></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-panel" data-panel="banners">
+          <div class="admin-grid">
+            <form class="admin-card form-grid" data-banner-form>
+              <input type="hidden" data-banner-id>
+              <h3>Banner da home</h3>
+              <label>
+                Titulo
+                <input class="field" data-banner-title required>
+              </label>
+              <label>
+                Subtitulo
+                <input class="field" data-banner-subtitle required>
+              </label>
+              <label>
+                Texto
+                <textarea class="textarea" data-banner-text required></textarea>
+              </label>
+              <label>
+                Texto do botao
+                <input class="field" data-banner-cta required>
+              </label>
+              <label>
+                Imagem
+                <input class="field" data-banner-image required>
+              </label>
+              <button class="button" type="submit">Salvar banner</button>
+              <button class="button secondary" type="button" data-banner-clear>Limpar formulario</button>
+            </form>
+
+            <div class="admin-card">
+              <h3>Banners cadastrados</h3>
+              <div class="admin-list" data-banner-list></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-panel" data-panel="company">
+          <form class="admin-card form-grid" data-company-form>
+            <h3>Dados institucionais</h3>
+            <div class="form-inline">
+              <label>
+                Nome da empresa
+                <input class="field" data-company-name required>
+              </label>
+              <label>
+                Slogan
+                <input class="field" data-company-slogan required>
+              </label>
+            </div>
+            <label>
+              Descricao
+              <textarea class="textarea" data-company-description required></textarea>
+            </label>
+            <div class="form-inline">
+              <label>
+                WhatsApp com DDI
+                <input class="field" data-company-whatsapp required>
+              </label>
+              <label>
+                WhatsApp para mostrar
+                <input class="field" data-company-whatsapp-display required>
+              </label>
+            </div>
+            <div class="form-inline">
+              <label>
+                Telefone
+                <input class="field" data-company-phone required>
+              </label>
+              <label>
+                E-mail
+                <input class="field" type="email" data-company-email required>
+              </label>
+            </div>
+            <label>
+              Instagram
+              <input class="field" data-company-instagram>
+            </label>
+            <label>
+              Endereco
+              <input class="field" data-company-address required>
+            </label>
+            <div class="form-inline">
+              <label>
+                CNPJ
+                <input class="field" data-company-cnpj>
+              </label>
+              <label>
+                Horario
+                <input class="field" data-company-hours>
+              </label>
+            </div>
+            <button class="button" type="submit">Salvar dados da empresa</button>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="data/site-data.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
