@@ -161,8 +161,8 @@
               <a class="button ghost" href="catalogo.html">Ver catalogo</a>
             </div>
             <div class="hero-metrics">
-              <div class="metric"><strong>${state.data.categories.length}+</strong><span>categorias organizadas</span></div>
-              <div class="metric"><strong>${state.data.products.length}+</strong><span>produtos iniciais</span></div>
+              <div class="metric"><strong>Casa</strong><span>limpeza para o dia a dia</span></div>
+              <div class="metric"><strong>Empresa</strong><span>itens para reposicao</span></div>
               <div class="metric"><strong>08h-17h</strong><span>atendimento em dias uteis</span></div>
             </div>
           </div>
@@ -225,19 +225,19 @@
         <div>
           <div class="eyebrow">Por que escolher a Brava</div>
           <h2>Variedade e atendimento direto para sua compra do dia a dia</h2>
-          <p class="lead">A nova estrutura do catalogo facilita a consulta por categoria e leva o cliente direto para o WhatsApp com o produto escolhido.</p>
+          <p class="lead">A Brava atende quem precisa comprar com praticidade, variedade e orientacao para escolher os produtos certos.</p>
           <div class="feature-list">
             <div class="feature-item">
               <span class="feature-mark">1</span>
-              <div><h3>Catalogo organizado</h3><p>Produtos separados por categoria para encontrar rapido o que precisa.</p></div>
+              <div><h3>Variedade em um so lugar</h3><p>Produtos para limpeza, higiene, descartaveis, papeis, aromatizadores e equipamentos.</p></div>
             </div>
             <div class="feature-item">
               <span class="feature-mark">2</span>
-              <div><h3>Orcamento pelo WhatsApp</h3><p>Cada item ja monta uma mensagem de pedido para a equipe Brava.</p></div>
+              <div><h3>Atendimento direto</h3><p>Fale com a equipe pelo WhatsApp para confirmar disponibilidade, valores e melhores opcoes.</p></div>
             </div>
             <div class="feature-item">
               <span class="feature-mark">3</span>
-              <div><h3>Painel simples</h3><p>O cliente consegue alterar produtos, banners e dados basicos sem mexer em codigo.</p></div>
+              <div><h3>Compra mais pratica</h3><p>Consulte o catalogo por categoria e envie seu pedido de orcamento em poucos cliques.</p></div>
             </div>
           </div>
         </div>

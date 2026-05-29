@@ -21,16 +21,16 @@ window.BRAVA_SEED = {
       id: "banner-1",
       title: "Brava Materiais de Limpeza",
       subtitle: "De tudo para facilitar sua vida",
-      text: "Produtos de limpeza, descartaveis, papeis, higiene e equipamentos para casas, empresas, comercios e condominios.",
+      text: "Produtos de limpeza, descartaveis, papeis, higiene e equipamentos para sua casa, empresa, comercio ou condominio.",
       cta: "Pedir orcamento",
       image:
         "https://static.wixstatic.com/media/e857c88665e244a1bab05993b74ee772.jpg/v1/fill/w_1200,h_720,al_c,q_85,enc_avif,quality_auto/e857c88665e244a1bab05993b74ee772.jpg"
     },
     {
       id: "banner-2",
-      title: "Catalogo completo para sua rotina",
+      title: "Variedade para sua rotina",
       subtitle: "Limpeza, higiene e praticidade",
-      text: "Encontre produtos profissionais, itens de reposicao e solucoes para ambientes comerciais e residenciais.",
+      text: "Encontre itens de reposicao, produtos profissionais e solucoes para manter seus ambientes sempre bem cuidados.",
       cta: "Ver catalogo",
       image:
         "https://static.wixstatic.com/media/851ee9a3fdd542869ddff81ccaf27cd9.jpg/v1/fill/w_1200,h_720,al_c,q_85,enc_avif,quality_auto/851ee9a3fdd542869ddff81ccaf27cd9.jpg"
@@ -39,7 +39,7 @@ window.BRAVA_SEED = {
       id: "banner-3",
       title: "Atendimento rapido pelo WhatsApp",
       subtitle: "Orcamentos sem complicacao",
-      text: "Escolha os produtos do catalogo e fale com a equipe Brava para confirmar disponibilidade, valores e entrega.",
+      text: "Escolha os produtos que precisa e fale com a equipe Brava para confirmar disponibilidade, valores e entrega.",
       cta: "Chamar no WhatsApp",
       image:
         "https://static.wixstatic.com/media/fe42c46e27b745ad8d007f01c5e495b1.jpg/v1/fill/w_1200,h_720,al_c,q_85,enc_avif,quality_auto/fe42c46e27b745ad8d007f01c5e495b1.jpg"
