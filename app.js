@@ -324,14 +324,27 @@
             <a class="button secondary" href="mailto:${escapeHtml(state.data.company.email)}">Enviar e-mail</a>
           </div>
         </div>
-        <div class="admin-card">
-          <h3>Dados de contato</h3>
-          <p><strong>WhatsApp:</strong> ${escapeHtml(state.data.company.whatsappDisplay)}</p>
-          <p><strong>Telefone:</strong> ${escapeHtml(state.data.company.phone)}</p>
-          <p><strong>E-mail:</strong> ${escapeHtml(state.data.company.email)}</p>
-          <p><strong>Endereco:</strong> ${escapeHtml(state.data.company.address)}</p>
-          <p><strong>Horario:</strong> ${escapeHtml(state.data.company.hours)}</p>
-          <p><strong>CNPJ:</strong> ${escapeHtml(state.data.company.cnpj)}</p>
+        <div class="contact-stack">
+          <div class="admin-card">
+            <h3>Dados de contato</h3>
+            <p><strong>WhatsApp:</strong> ${escapeHtml(state.data.company.whatsappDisplay)}</p>
+            <p><strong>Telefone:</strong> ${escapeHtml(state.data.company.phone)}</p>
+            <p><strong>E-mail:</strong> ${escapeHtml(state.data.company.email)}</p>
+            <p><strong>Endereco:</strong> ${escapeHtml(state.data.company.address)}</p>
+            <p><strong>Horario:</strong> ${escapeHtml(state.data.company.hours)}</p>
+            <p><strong>CNPJ:</strong> ${escapeHtml(state.data.company.cnpj)}</p>
+          </div>
+          <div class="map-card">
+            <iframe
+              title="Mapa da Brava Materiais de Limpeza"
+              src="${escapeHtml(state.data.company.mapsEmbed)}"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+            <a class="button secondary" href="${escapeHtml(state.data.company.mapsUrl)}" target="_blank" rel="noreferrer">
+              Abrir no Google Maps
+            </a>
+          </div>
         </div>
       </div>
     `;

@@ -421,6 +421,31 @@ h3 {
   object-fit: cover;
 }
 
+.contact-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.map-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: 0 10px 30px rgba(20, 35, 50, 0.06);
+}
+
+.map-card iframe {
+  display: block;
+  width: 100%;
+  min-height: 290px;
+  border: 0;
+}
+
+.map-card .button {
+  width: calc(100% - 32px);
+  margin: 16px;
+}
+
 .toolbar {
   display: grid;
   grid-template-columns: 1fr 240px;

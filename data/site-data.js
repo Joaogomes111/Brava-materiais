@@ -12,6 +12,10 @@ window.BRAVA_SEED = {
     email: "materiais.brava@gmail.com",
     instagram: "https://www.instagram.com/brava_materiais_de_limpeza/",
     address: "Av. Osvaldo Reis, 2980 Praia Brava, Itajai - SC",
+    mapsUrl:
+      "https://www.google.com/maps/place/Brava+Materiais+de+Limpeza/data=!4m2!3m1!1s0x0:0x8d3efcf983a27fcf?sa=X&ved=1t:2428&ictx=111",
+    mapsEmbed:
+      "https://maps.google.com/maps?q=Brava%20Materiais%20de%20Limpeza%2C%20Av.%20Osvaldo%20Reis%2C%202980%20Praia%20Brava%2C%20Itajai%20SC&t=&z=16&ie=UTF8&iwloc=&output=embed",
     cnpj: "25.014.862/0001-02",
     hours: "Segunda a sexta, das 08:00 as 17:00",
     logo: "assets/brava-logo.png"
