@@ -190,21 +190,28 @@ button {
 }
 
 .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 32px;
+  border-radius: 999px;
+  background: #fff5df;
   color: var(--brand-gold);
   font-size: 0.94rem;
   font-weight: 900;
   letter-spacing: 0.08em;
+  line-height: 1;
+  margin-bottom: 18px;
+  padding: 7px 12px;
   text-transform: uppercase;
 }
 
-.section .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  border-radius: 999px;
-  background: #fff5df;
+.hero .eyebrow,
+.page-hero .eyebrow,
+.cta-band .eyebrow {
+  background: rgba(255, 245, 223, 0.14);
   color: #a46f00;
-  padding: 7px 12px;
+  color: var(--brand-gold);
 }
 
 h1,
@@ -280,6 +287,12 @@ h3 {
   max-width: 620px;
   color: rgba(255, 255, 255, 0.86);
   font-size: 1.18rem;
+}
+
+.hero h1,
+.page-hero h1,
+.section h2 {
+  margin-top: 0;
 }
 
 .hero-actions {
@@ -1056,6 +1069,13 @@ h3 {
 
   .section {
     padding: 52px 0;
+  }
+
+  .eyebrow {
+    min-height: 30px;
+    margin-bottom: 14px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
   }
 
   .section-head {
