@@ -59,13 +59,15 @@
 
     qs("[data-product-form]")?.addEventListener("submit", saveProduct);
     qs("[data-product-clear]")?.addEventListener("click", clearProductForm);
-    qs("[data-product-file]")?.addEventListener("change", handleProductFile);
+    qs("[data-product-file]")?.addEventListener("change", (event) => handleImageFile(event, "[data-product-image]"));
 
     qs("[data-category-form]")?.addEventListener("submit", saveCategory);
     qs("[data-category-clear]")?.addEventListener("click", clearCategoryForm);
+    qs("[data-category-file]")?.addEventListener("change", (event) => handleImageFile(event, "[data-category-image]"));
 
     qs("[data-banner-form]")?.addEventListener("submit", saveBanner);
     qs("[data-banner-clear]")?.addEventListener("click", clearBannerForm);
+    qs("[data-banner-file]")?.addEventListener("change", (event) => handleImageFile(event, "[data-banner-image]"));
 
     qs("[data-company-form]")?.addEventListener("submit", saveCompany);
   }
@@ -196,13 +198,13 @@
     qs("[data-product-form] h3").textContent = "Novo produto";
   }
 
-  function handleProductFile(event) {
+  function handleImageFile(event, targetSelector) {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-      setValue("[data-product-image]", reader.result);
+      setValue(targetSelector, reader.result);
     };
     reader.readAsDataURL(file);
   }
