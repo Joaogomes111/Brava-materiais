@@ -27,11 +27,26 @@
   function loadData() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return JSON.parse(stored);
+      if (stored) return mergeSeedData(JSON.parse(stored));
     } catch (error) {
       console.warn("Nao foi possivel carregar dados locais.", error);
     }
     return structuredClone(window.BRAVA_SEED);
+  }
+
+  function mergeSeedData(storedData) {
+    const seed = structuredClone(window.BRAVA_SEED);
+    return {
+      ...seed,
+      ...storedData,
+      company: {
+        ...seed.company,
+        ...(storedData.company || {})
+      },
+      banners: storedData.banners?.length ? storedData.banners : seed.banners,
+      categories: storedData.categories?.length ? storedData.categories : seed.categories,
+      products: storedData.products?.length ? storedData.products : seed.products
+    };
   }
 
   function saveData(nextData) {
@@ -312,6 +327,8 @@
   function renderContact() {
     const target = document.querySelector("[data-contact]");
     if (!target) return;
+    const mapsUrl = state.data.company.mapsUrl || window.BRAVA_SEED.company.mapsUrl;
+    const mapsEmbed = state.data.company.mapsEmbed || window.BRAVA_SEED.company.mapsEmbed;
 
     target.innerHTML = `
       <div class="feature-band">
@@ -335,13 +352,17 @@
             <p><strong>CNPJ:</strong> ${escapeHtml(state.data.company.cnpj)}</p>
           </div>
           <div class="map-card">
+            <div class="map-fallback">
+              <strong>Brava Materiais de Limpeza</strong>
+              <span>${escapeHtml(state.data.company.address)}</span>
+            </div>
             <iframe
               title="Mapa da Brava Materiais de Limpeza"
-              src="${escapeHtml(state.data.company.mapsEmbed)}"
+              src="${escapeHtml(mapsEmbed)}"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
-            <a class="button secondary" href="${escapeHtml(state.data.company.mapsUrl)}" target="_blank" rel="noreferrer">
+            <a class="button secondary" href="${escapeHtml(mapsUrl)}" target="_blank" rel="noreferrer">
               Abrir no Google Maps
             </a>
           </div>

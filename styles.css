@@ -427,6 +427,7 @@ h3 {
 }
 
 .map-card {
+  position: relative;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -435,15 +436,45 @@ h3 {
 }
 
 .map-card iframe {
+  position: relative;
+  z-index: 2;
   display: block;
   width: 100%;
   min-height: 290px;
   border: 0;
+  background: transparent;
 }
 
 .map-card .button {
+  position: relative;
+  z-index: 3;
   width: calc(100% - 32px);
   margin: 16px;
+}
+
+.map-fallback {
+  position: absolute;
+  inset: 0 0 64px;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  background:
+    linear-gradient(135deg, rgba(7, 91, 127, 0.12), rgba(201, 151, 33, 0.12)),
+    #f4f7fa;
+  color: var(--brand-blue-dark);
+  padding: 24px;
+  text-align: center;
+}
+
+.map-fallback strong {
+  font-size: 1.1rem;
+}
+
+.map-fallback span {
+  max-width: 320px;
+  color: var(--muted);
 }
 
 .toolbar {
