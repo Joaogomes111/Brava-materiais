@@ -57,27 +57,6 @@ button {
   margin-inline: auto;
 }
 
-.topbar {
-  background: var(--brand-blue-dark);
-  color: var(--white);
-  font-size: 0.88rem;
-}
-
-.topbar .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 42px;
-  gap: 16px;
-}
-
-.topbar-links {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
 .site-header {
   position: sticky;
   top: 0;
@@ -212,10 +191,20 @@ button {
 
 .eyebrow {
   color: var(--brand-gold);
-  font-size: 0.8rem;
+  font-size: 0.94rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.section .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border-radius: 999px;
+  background: #fff5df;
+  color: #a46f00;
+  padding: 7px 12px;
 }
 
 h1,
@@ -632,6 +621,11 @@ h3 {
   color: rgba(255, 255, 255, 0.72);
 }
 
+.footer-contact-list {
+  display: grid;
+  gap: 8px;
+}
+
 .footer a:hover {
   color: var(--white);
 }
@@ -972,16 +966,6 @@ h3 {
 @media (max-width: 640px) {
   .container {
     width: min(100% - 24px, var(--max));
-  }
-
-  .topbar .container {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 9px 0;
-  }
-
-  .topbar-links {
-    gap: 10px;
   }
 
   .header-row {

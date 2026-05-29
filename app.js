@@ -57,16 +57,6 @@
 
     if (header) {
       header.innerHTML = `
-        <div class="topbar">
-          <div class="container">
-            <span>${escapeHtml(state.data.company.hours)}</span>
-            <div class="topbar-links">
-              <a href="tel:${digits(state.data.company.phone)}">${escapeHtml(state.data.company.phone)}</a>
-              <a href="mailto:${escapeHtml(state.data.company.email)}">${escapeHtml(state.data.company.email)}</a>
-              <a href="${escapeHtml(state.data.company.instagram)}" target="_blank" rel="noreferrer">Instagram</a>
-            </div>
-          </div>
-        </div>
         <div class="site-header">
           <div class="container header-row">
             <a class="brand" href="index.html" aria-label="${escapeHtml(state.data.company.name)}">
@@ -105,9 +95,12 @@
               </div>
               <div>
                 <h3>Contato</h3>
-                <p><a href="${whatsappLink()}" target="_blank" rel="noreferrer">${escapeHtml(state.data.company.whatsappDisplay)}</a></p>
-                <p><a href="tel:${digits(state.data.company.phone)}">${escapeHtml(state.data.company.phone)}</a></p>
-                <p><a href="mailto:${escapeHtml(state.data.company.email)}">${escapeHtml(state.data.company.email)}</a></p>
+                <div class="footer-contact-list">
+                  <a href="${whatsappLink()}" target="_blank" rel="noreferrer">WhatsApp: ${escapeHtml(state.data.company.whatsappDisplay)}</a>
+                  <a href="tel:${digits(state.data.company.phone)}">Telefone: ${escapeHtml(state.data.company.phone)}</a>
+                  <a href="mailto:${escapeHtml(state.data.company.email)}">E-mail: ${escapeHtml(state.data.company.email)}</a>
+                  <a href="${escapeHtml(state.data.company.instagram)}" target="_blank" rel="noreferrer">Instagram</a>
+                </div>
               </div>
               <div>
                 <h3>Onde nos encontrar</h3>
