@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "brava_catalog_data_v1";
+  const STORAGE_KEY = "brava_catalog_data_v2";
   const SESSION_KEY = "brava_admin_demo_session";
   const PLACEHOLDER_IMAGE = "assets/cleaning-bottles.jpg";
 
@@ -50,7 +50,7 @@
     });
 
     qs("[data-reset-demo]")?.addEventListener("click", () => {
-      if (!window.confirm("Restaurar os dados originais da demonstracao?")) return;
+      if (!window.confirm("Restaurar os dados originais da demonstração?")) return;
       localStorage.removeItem(STORAGE_KEY);
       data = structuredClone(window.BRAVA_SEED);
       renderAll();
@@ -83,11 +83,26 @@
   function loadData() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return JSON.parse(stored);
+      if (stored) return mergeSeedData(JSON.parse(stored));
     } catch (error) {
-      console.warn("Nao foi possivel carregar dados locais.", error);
+      console.warn("Não foi possível carregar dados locais.", error);
     }
     return structuredClone(window.BRAVA_SEED);
+  }
+
+  function mergeSeedData(storedData) {
+    const seed = structuredClone(window.BRAVA_SEED);
+    return {
+      ...seed,
+      ...storedData,
+      company: {
+        ...seed.company,
+        ...(storedData.company || {})
+      },
+      banners: storedData.banners?.length ? storedData.banners : seed.banners,
+      categories: storedData.categories?.length ? storedData.categories : seed.categories,
+      products: storedData.products?.length ? storedData.products : seed.products
+    };
   }
 
   function persist() {
@@ -188,7 +203,7 @@
     data.products = data.products.filter((item) => item.id !== id);
     persist();
     renderProducts();
-    notify("Produto excluido.");
+    notify("Produto excluído.");
   }
 
   function clearProductForm() {
@@ -277,7 +292,7 @@
 
   function deleteCategory(id) {
     if (countProducts(id) > 0) {
-      window.alert("Nao e possivel excluir uma categoria com produtos vinculados. Mova ou exclua os produtos primeiro.");
+      window.alert("Não é possível excluir uma categoria com produtos vinculados. Mova ou exclua os produtos primeiro.");
       return;
     }
     const category = data.categories.find((item) => item.id === id);
@@ -288,7 +303,7 @@
     persist();
     renderCategories();
     renderCategorySelect();
-    notify("Categoria excluida.");
+    notify("Categoria excluída.");
   }
 
   function clearCategoryForm() {
@@ -378,7 +393,7 @@
     data.banners = data.banners.filter((item) => item.id !== id);
     persist();
     renderBanners();
-    notify("Banner excluido.");
+    notify("Banner excluído.");
   }
 
   function clearBannerForm() {

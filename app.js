@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "brava_catalog_data_v1";
+  const STORAGE_KEY = "brava_catalog_data_v2";
   const state = {
     data: loadData(),
     activeBanner: 0,
@@ -29,7 +29,7 @@
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) return mergeSeedData(JSON.parse(stored));
     } catch (error) {
-      console.warn("Nao foi possivel carregar dados locais.", error);
+      console.warn("Não foi possível carregar dados locais.", error);
     }
     return structuredClone(window.BRAVA_SEED);
   }
@@ -78,8 +78,8 @@
               <img src="${escapeHtml(state.data.company.logo)}" alt="${escapeHtml(state.data.company.name)}">
             </a>
             <nav class="nav" data-nav>
-              <a href="index.html" ${current === "home" ? 'aria-current="page"' : ""}>Inicio</a>
-              <a href="catalogo.html" ${current === "catalog" ? 'aria-current="page"' : ""}>Catalogo</a>
+              <a href="index.html" ${current === "home" ? 'aria-current="page"' : ""}>Início</a>
+              <a href="catalogo.html" ${current === "catalog" ? 'aria-current="page"' : ""}>Catálogo</a>
               <a href="contato.html" ${current === "contact" ? 'aria-current="page"' : ""}>Contato</a>
               <a href="admin.html">Admin</a>
             </nav>
@@ -102,7 +102,7 @@
                 <p>${escapeHtml(state.data.company.description)}</p>
               </div>
               <div>
-                <h3>Catalogo</h3>
+                <h3>Catálogo</h3>
                 ${state.data.categories
                   .slice(0, 6)
                   .map((category) => `<p><a href="catalogo.html?categoria=${category.id}">${escapeHtml(category.name)}</a></p>`)
@@ -166,12 +166,12 @@
             <p>${escapeHtml(banner.text)}</p>
             <div class="hero-actions">
               <a class="button whatsapp" href="${whatsappLink()}" target="_blank" rel="noreferrer">${escapeHtml(banner.cta)}</a>
-              <a class="button ghost" href="catalogo.html">Ver catalogo</a>
+              <a class="button ghost" href="catalogo.html">Ver catálogo</a>
             </div>
             <div class="hero-metrics">
               <div class="metric"><strong>Casa</strong><span>limpeza para o dia a dia</span></div>
-              <div class="metric"><strong>Empresa</strong><span>itens para reposicao</span></div>
-              <div class="metric"><strong>08h-17h</strong><span>atendimento em dias uteis</span></div>
+              <div class="metric"><strong>Empresa</strong><span>itens para reposição</span></div>
+              <div class="metric"><strong>08h-17h</strong><span>atendimento em dias úteis</span></div>
             </div>
           </div>
         </div>
@@ -233,19 +233,19 @@
         <div>
           <div class="eyebrow">Por que escolher a Brava</div>
           <h2>Variedade e atendimento direto para sua compra do dia a dia</h2>
-          <p class="lead">A Brava atende quem precisa comprar com praticidade, variedade e orientacao para escolher os produtos certos.</p>
+          <p class="lead">A Brava atende quem precisa comprar com praticidade, variedade e orientação para escolher os produtos certos.</p>
           <div class="feature-list">
             <div class="feature-item">
               <span class="feature-mark">1</span>
-              <div><h3>Variedade em um so lugar</h3><p>Produtos para limpeza, higiene, descartaveis, papeis, aromatizadores e equipamentos.</p></div>
+              <div><h3>Variedade em um só lugar</h3><p>Produtos para limpeza, higiene, descartáveis, papéis, aromatizadores e equipamentos.</p></div>
             </div>
             <div class="feature-item">
               <span class="feature-mark">2</span>
-              <div><h3>Atendimento direto</h3><p>Fale com a equipe pelo WhatsApp para confirmar disponibilidade, valores e melhores opcoes.</p></div>
+              <div><h3>Atendimento direto</h3><p>Fale com a equipe pelo WhatsApp para confirmar disponibilidade, valores e melhores opções.</p></div>
             </div>
             <div class="feature-item">
               <span class="feature-mark">3</span>
-              <div><h3>Compra mais pratica</h3><p>Consulte o catalogo por categoria e envie seu pedido de orcamento em poucos cliques.</p></div>
+              <div><h3>Compra mais prática</h3><p>Consulte o catálogo por categoria e envie seu pedido de orçamento em poucos cliques.</p></div>
             </div>
           </div>
         </div>
@@ -297,11 +297,11 @@
     }
 
     const activeCategory = getCategory(state.filters.category);
-    if (title) title.textContent = activeCategory ? activeCategory.name : "Catalogo de produtos";
+    if (title) title.textContent = activeCategory ? activeCategory.name : "Catálogo de produtos";
     if (subtitle) {
       subtitle.textContent = activeCategory
         ? activeCategory.description
-        : "Consulte produtos de limpeza, higiene, descartaveis, papeis e equipamentos. Para comprar, chame a Brava no WhatsApp.";
+        : "Consulte produtos de limpeza, higiene, descartáveis, papéis e equipamentos. Para comprar, chame a Brava no WhatsApp.";
     }
 
     const query = normalize(state.filters.search);
@@ -334,10 +334,10 @@
       <div class="feature-band">
         <div>
           <div class="eyebrow">Fale conosco</div>
-          <h2>Entre em contato pelo WhatsApp para fazermos um orcamento</h2>
-          <p class="lead">A equipe da ${escapeHtml(state.data.company.name)} atende de segunda a sexta e pode confirmar valores, disponibilidade e melhores opcoes para sua necessidade.</p>
+          <h2>Entre em contato pelo WhatsApp para fazermos um orçamento</h2>
+          <p class="lead">A equipe da ${escapeHtml(state.data.company.name)} atende de segunda a sexta e pode confirmar valores, disponibilidade e melhores opções para sua necessidade.</p>
           <div class="hero-actions">
-            <a class="button whatsapp" href="${whatsappLink("Ola, gostaria de fazer um orcamento.")}" target="_blank" rel="noreferrer">Chamar no WhatsApp</a>
+            <a class="button whatsapp" href="${whatsappLink("Olá, gostaria de fazer um orçamento.")}" target="_blank" rel="noreferrer">Chamar no WhatsApp</a>
             <a class="button secondary" href="mailto:${escapeHtml(state.data.company.email)}">Enviar e-mail</a>
           </div>
         </div>
@@ -347,8 +347,8 @@
             <p><strong>WhatsApp:</strong> ${escapeHtml(state.data.company.whatsappDisplay)}</p>
             <p><strong>Telefone:</strong> ${escapeHtml(state.data.company.phone)}</p>
             <p><strong>E-mail:</strong> ${escapeHtml(state.data.company.email)}</p>
-            <p><strong>Endereco:</strong> ${escapeHtml(state.data.company.address)}</p>
-            <p><strong>Horario:</strong> ${escapeHtml(state.data.company.hours)}</p>
+            <p><strong>Endereço:</strong> ${escapeHtml(state.data.company.address)}</p>
+            <p><strong>Horário:</strong> ${escapeHtml(state.data.company.hours)}</p>
             <p><strong>CNPJ:</strong> ${escapeHtml(state.data.company.cnpj)}</p>
           </div>
           <div class="map-card">
@@ -382,12 +382,12 @@
         <div class="product-body">
           <span class="product-category">${escapeHtml(categoryName)}</span>
           <h3 class="product-title">${escapeHtml(product.name)}</h3>
-          <p class="product-description">${escapeHtml(product.description || "Produto disponivel para orcamento.")}</p>
+          <p class="product-description">${escapeHtml(product.description || "Produto disponível para orçamento.")}</p>
           <div class="product-footer">
             <div class="price">${product.price ? escapeHtml(product.price) : "Sob consulta"}</div>
             <div class="product-actions">
               <button class="button secondary" type="button" data-product-detail="${escapeHtml(product.id)}">Ver detalhes</button>
-              <a class="button whatsapp" href="${productWhatsappLink(product)}" target="_blank" rel="noreferrer">Pedir orcamento</a>
+              <a class="button whatsapp" href="${productWhatsappLink(product)}" target="_blank" rel="noreferrer">Pedir orçamento</a>
             </div>
           </div>
         </div>
@@ -433,11 +433,11 @@
             <button class="modal-close" type="button" data-modal-close aria-label="Fechar">×</button>
             <span class="product-category">${escapeHtml(getCategoryName(product.categoryId))}</span>
             <h2>${escapeHtml(product.name)}</h2>
-            <p>${escapeHtml(product.description || "Produto disponivel para orcamento.")}</p>
-            <p><strong>Codigo:</strong> ${escapeHtml(product.code || "Nao informado")}</p>
+            <p>${escapeHtml(product.description || "Produto disponível para orçamento.")}</p>
+            <p><strong>Código:</strong> ${escapeHtml(product.code || "Não informado")}</p>
             <p><strong>Valor:</strong> ${product.price ? escapeHtml(product.price) : "Sob consulta"}</p>
             <div class="hero-actions">
-              <a class="button whatsapp" href="${productWhatsappLink(product)}" target="_blank" rel="noreferrer">Pedir orcamento pelo WhatsApp</a>
+              <a class="button whatsapp" href="${productWhatsappLink(product)}" target="_blank" rel="noreferrer">Pedir orçamento pelo WhatsApp</a>
               <button class="button secondary" type="button" data-modal-close>Fechar</button>
             </div>
           </div>
@@ -465,12 +465,12 @@
   }
 
   function whatsappLink(message) {
-    const defaultMessage = message || "Ola, gostaria de fazer um orcamento com a Brava Materiais de Limpeza.";
+    const defaultMessage = message || "Olá, gostaria de fazer um orçamento com a Brava Materiais de Limpeza.";
     return `https://wa.me/${digits(state.data.company.whatsapp)}?text=${encodeURIComponent(defaultMessage)}`;
   }
 
   function productWhatsappLink(product) {
-    const message = `Ola, gostaria de fazer um orcamento do produto: ${product.name}${product.code ? ` (${product.code})` : ""}.`;
+    const message = `Olá, gostaria de fazer um orçamento do produto: ${product.name}${product.code ? ` (${product.code})` : ""}.`;
     return whatsappLink(message);
   }
 
