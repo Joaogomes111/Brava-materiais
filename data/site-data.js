@@ -48,8 +48,7 @@ window.BRAVA_SEED = {
       id: "equipamentos",
       name: "Equipamentos",
       description: "Mops, rodos, vassouras, pás, suportes, dispensers e acessórios.",
-      image:
-        "https://static.wixstatic.com/media/fe42c46e27b745ad8d007f01c5e495b1.jpg/v1/fill/w_760,h_520,al_c,q_85,enc_avif,quality_auto/fe42c46e27b745ad8d007f01c5e495b1.jpg"
+      image: "assets/category-equipamentos.jpg"
     },
     {
       id: "papeis-e-panos",
@@ -73,8 +72,7 @@ window.BRAVA_SEED = {
       id: "cozinha",
       name: "Cozinha",
       description: "Desengordurantes, detergentes, limpa-alumínio e produtos para lava-louças.",
-      image:
-        "https://static.wixstatic.com/media/e857c88665e244a1bab05993b74ee772.jpg/v1/fill/w_760,h_520,al_c,q_85,enc_avif,quality_auto/e857c88665e244a1bab05993b74ee772.jpg"
+      image: "assets/category-cozinha.jpg"
     },
     {
       id: "diversos",
@@ -463,11 +461,11 @@ window.BRAVA_SEED = {
   const categoryImages = {
     "produtos-de-limpeza": "assets/category-produtos-limpeza.jpg",
     descartaveis: "assets/category-descartaveis.jpg",
-    equipamentos: "assets/hero-equipment.jpg",
+    equipamentos: "assets/category-equipamentos.jpg",
     "papeis-e-panos": "assets/category-papeis-panos.jpg",
     aromatizadores: "assets/category-aromatizadores.jpg",
     banheiro: "assets/category-banheiro.jpg",
-    cozinha: "assets/hero-cleaning.jpg",
+    cozinha: "assets/category-cozinha.jpg",
     diversos: "assets/category-diversos.jpg"
   };
 
