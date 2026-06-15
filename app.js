@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "brava_catalog_data_v2";
+  const STORAGE_KEY = "brava_catalog_data_v3";
   const state = {
     data: loadData(),
     activeBanner: 0,

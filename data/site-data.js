@@ -18,7 +18,7 @@ window.BRAVA_SEED = {
       "https://maps.google.com/maps?q=Brava%20Materiais%20de%20Limpeza%2C%20Av.%20Osvaldo%20Reis%2C%202980%20Praia%20Brava%2C%20Itajai%20SC&t=&z=16&ie=UTF8&iwloc=&output=embed",
     cnpj: "25.014.862/0001-02",
     hours: "Segunda a sexta, das 08h às 17h",
-    logo: "assets/brava-logo.png"
+    logo: "assets/logo-brava-materiais.jpeg"
   },
   banners: [
     {
