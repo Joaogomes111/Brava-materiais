@@ -330,10 +330,12 @@ h3 {
 
 .banner-tabs {
   position: absolute;
-  right: max(16px, calc((100vw - var(--max)) / 2));
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 30px;
   z-index: 3;
   display: flex;
+  justify-content: center;
   gap: 8px;
 }
 

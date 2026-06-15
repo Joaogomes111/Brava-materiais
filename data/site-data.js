@@ -29,24 +29,6 @@ window.BRAVA_SEED = {
       cta: "Pedir orçamento",
       image:
         "https://static.wixstatic.com/media/e857c88665e244a1bab05993b74ee772.jpg/v1/fill/w_1200,h_720,al_c,q_85,enc_avif,quality_auto/e857c88665e244a1bab05993b74ee772.jpg"
-    },
-    {
-      id: "banner-2",
-      title: "Variedade para sua rotina",
-      subtitle: "Limpeza, higiene e praticidade",
-      text: "Encontre itens de reposição, produtos profissionais e soluções para manter seus ambientes sempre bem cuidados.",
-      cta: "Ver catálogo",
-      image:
-        "https://static.wixstatic.com/media/851ee9a3fdd542869ddff81ccaf27cd9.jpg/v1/fill/w_1200,h_720,al_c,q_85,enc_avif,quality_auto/851ee9a3fdd542869ddff81ccaf27cd9.jpg"
-    },
-    {
-      id: "banner-3",
-      title: "Atendimento rápido pelo WhatsApp",
-      subtitle: "Orçamentos sem complicação",
-      text: "Escolha os produtos que precisa e fale com a equipe Brava para confirmar disponibilidade, valores e entrega.",
-      cta: "Chamar no WhatsApp",
-      image:
-        "https://static.wixstatic.com/media/fe42c46e27b745ad8d007f01c5e495b1.jpg/v1/fill/w_1200,h_720,al_c,q_85,enc_avif,quality_auto/fe42c46e27b745ad8d007f01c5e495b1.jpg"
     }
   ],
   categories: [
@@ -510,8 +492,6 @@ window.BRAVA_SEED = {
   };
 
   window.BRAVA_SEED.banners[0].image = "assets/hero-cleaning.jpg";
-  window.BRAVA_SEED.banners[1].image = "assets/hero-products.jpg";
-  window.BRAVA_SEED.banners[2].image = "assets/hero-equipment.jpg";
 
   window.BRAVA_SEED.categories = window.BRAVA_SEED.categories.map((category) => ({
     ...category,
