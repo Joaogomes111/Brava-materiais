@@ -36,15 +36,13 @@ window.BRAVA_SEED = {
       id: "produtos-de-limpeza",
       name: "Produtos de Limpeza",
       description: "Químicos, desinfetantes, detergentes, limpadores e soluções profissionais.",
-      image:
-        "https://static.wixstatic.com/media/11062b_51935b9926aa4c939cb7ba228603c8db~mv2.jpg/v1/fill/w_760,h_520,al_c,q_85,enc_avif,quality_auto/11062b_51935b9926aa4c939cb7ba228603c8db~mv2.jpg"
+      image: "assets/category-produtos-limpeza.jpg"
     },
     {
       id: "descartaveis",
       name: "Descartáveis",
       description: "Luvas, máscaras, toucas, mexedores, guardanapos e itens de uso único.",
-      image:
-        "https://static.wixstatic.com/media/8469f3_5bdd242bc323483f97cebb038053763f~mv2.jpg/v1/fill/w_760,h_520,al_c,q_85,enc_avif,quality_auto/8469f3_5bdd242bc323483f97cebb038053763f~mv2.jpg"
+      image: "assets/category-descartaveis.jpg"
     },
     {
       id: "equipamentos",
@@ -57,22 +55,19 @@ window.BRAVA_SEED = {
       id: "papeis-e-panos",
       name: "Papéis e Panos",
       description: "Papéis toalha, papéis higiênicos, panos multiuso e panos de limpeza.",
-      image:
-        "https://static.wixstatic.com/media/11062b_cfcf71e0ef1b4d1fb672d568f774eef6~mv2_d_5023_3349_s_4_2.jpg/v1/fill/w_760,h_520,al_c,q_85,enc_avif,quality_auto/11062b_cfcf71e0ef1b4d1fb672d568f774eef6~mv2_d_5023_3349_s_4_2.jpg"
+      image: "assets/category-papeis-panos.jpg"
     },
     {
       id: "aromatizadores",
       name: "Aromatizadores",
       description: "Aromatizadores, essências, águas perfumadas e itens para ambientes.",
-      image:
-        "https://static.wixstatic.com/media/8469f3_49b74e06adf44f7799a49bd395c4fac2~mv2.webp/v1/fill/w_760,h_520,al_c,q_85,enc_avif,quality_auto/8469f3_49b74e06adf44f7799a49bd395c4fac2~mv2.webp"
+      image: "assets/category-aromatizadores.jpg"
     },
     {
       id: "banheiro",
       name: "Banheiro",
       description: "Sabonetes, saboneteiras, papéis, suportes, refis e itens sanitários.",
-      image:
-        "https://static.wixstatic.com/media/8469f3_b54cea9ff0c64a27bff608caddb79d89~mv2.png/v1/fill/w_760,h_520,al_c,q_90,enc_avif,quality_auto/8469f3_b54cea9ff0c64a27bff608caddb79d89~mv2.png"
+      image: "assets/category-banheiro.jpg"
     },
     {
       id: "cozinha",
@@ -85,8 +80,7 @@ window.BRAVA_SEED = {
       id: "diversos",
       name: "Diversos",
       description: "Itens complementares para limpeza, organização e reposição do dia a dia.",
-      image:
-        "https://static.wixstatic.com/media/8469f3_42274b4142ef402f95da4168883fb642~mv2.jpg/v1/fill/w_760,h_520,al_c,q_85,enc_avif,quality_auto/8469f3_42274b4142ef402f95da4168883fb642~mv2.jpg"
+      image: "assets/category-diversos.jpg"
     }
   ],
   products: [
@@ -467,14 +461,14 @@ window.BRAVA_SEED = {
 
 (() => {
   const categoryImages = {
-    "produtos-de-limpeza": "assets/cleaning-bottles.jpg",
-    descartaveis: "assets/product-gallon-pink.jpg",
+    "produtos-de-limpeza": "assets/category-produtos-limpeza.jpg",
+    descartaveis: "assets/category-descartaveis.jpg",
     equipamentos: "assets/hero-equipment.jpg",
-    "papeis-e-panos": "assets/cloths.jpg",
-    aromatizadores: "assets/product-spray.png",
-    banheiro: "assets/product-bottle.jpg",
+    "papeis-e-panos": "assets/category-papeis-panos.jpg",
+    aromatizadores: "assets/category-aromatizadores.jpg",
+    banheiro: "assets/category-banheiro.jpg",
     cozinha: "assets/hero-cleaning.jpg",
-    diversos: "assets/product-gallon-red.jpg"
+    diversos: "assets/category-diversos.jpg"
   };
 
   const productImages = {

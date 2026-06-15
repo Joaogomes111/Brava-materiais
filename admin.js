@@ -1,5 +1,5 @@
 (function () {
-  const STORAGE_KEY = "brava_catalog_data_v4";
+  const STORAGE_KEY = "brava_catalog_data_v5";
   const SESSION_KEY = "brava_admin_demo_session";
   const PLACEHOLDER_IMAGE = "assets/cleaning-bottles.jpg";
 
