@@ -13,20 +13,21 @@
       <form class="login-card" data-login-form>
         <img src="assets/logo-brava-materiais.jpeg" alt="Brava Materiais de Limpeza">
         <h1 style="font-size: 2rem;">Painel administrativo</h1>
-        <p class="lead" style="font-size: 1rem;">Entre para testar o gerenciamento do catálogo.</p>
+        <p class="lead" style="font-size: 1rem;">Entre para gerenciar o catálogo da Brava.</p>
         <div class="form-grid">
           <label>
             E-mail
-            <input class="field" type="email" value="admin@brava.local" data-login-email required>
+            <input class="field" type="email" placeholder="seu@email.com" autocomplete="username" data-login-email required>
           </label>
           <label>
             Senha
-            <input class="field" type="password" value="brava123" data-login-password required>
+            <input class="field" type="password" placeholder="Sua senha" autocomplete="current-password" data-login-password required>
           </label>
           <button class="button" type="submit">Entrar no painel</button>
         </div>
+        <p class="hidden" data-login-message style="color: var(--danger); font-size: 0.88rem; margin-top: 16px;"></p>
         <p style="color: var(--muted); font-size: 0.88rem; margin-top: 16px;">
-          Esta primeira versão usa login demonstrativo. No Supabase, o login real será por usuário e senha cadastrados.
+          Use o e-mail e a senha cadastrados no Supabase.
         </p>
       </form>
     </div>
@@ -51,13 +52,12 @@
             <p class="lead">Cadastre produtos, organize categorias, edite banners e ajuste dados da empresa.</p>
           </div>
           <div class="hero-actions">
-            <button class="button secondary" type="button" data-reset-demo>Restaurar dados</button>
             <button class="button" type="button" data-logout>Sair</button>
           </div>
         </div>
 
         <div class="notice">
-          Modo demonstração: as alterações ficam salvas neste navegador. Depois de conectar o Supabase, estes formulários passam a salvar no banco online.
+          Modo online: as alterações feitas neste painel são salvas no Supabase e aparecem no site publicado.
         </div>
 
         <section class="admin-panel active" data-panel="products">
@@ -169,7 +169,7 @@
               </label>
               <label>
                 Imagem
-                <input class="field" data-banner-image required>
+                <input class="field" data-banner-image placeholder="https://...">
               </label>
               <label>
                 Trocar imagem pelo computador
@@ -247,6 +247,8 @@
       </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script src="data/site-data.js"></script>
     <script src="admin.js"></script>
   </body>

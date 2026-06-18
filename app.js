@@ -1,7 +1,6 @@
 (function () {
-  const STORAGE_KEY = "brava_catalog_data_v6";
   const state = {
-    data: loadData(),
+    data: structuredClone(window.BRAVA_SEED),
     activeBanner: 0,
     filters: {
       category: getQueryParam("categoria") || "todos",
@@ -10,9 +9,12 @@
     }
   };
 
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", () => {
+    init().catch((error) => console.error("Não foi possível iniciar o site.", error));
+  });
 
-  function init() {
+  async function init() {
+    state.data = await loadData();
     renderSharedLayout();
     bindMobileMenu();
 
@@ -24,46 +26,86 @@
     renderProductModal();
   }
 
-  function loadData() {
+  async function loadData() {
+    const fallback = structuredClone(window.BRAVA_SEED);
+    const client = window.bravaSupabase;
+    if (!client) return fallback;
+
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return mergeSeedData(JSON.parse(stored));
+      const [companyResult, categoriesResult, productsResult, bannersResult] = await Promise.all([
+        client.from("company_settings").select("*").eq("id", true).maybeSingle(),
+        client.from("categories").select("*").eq("is_active", true).order("sort_order"),
+        client.from("products").select("*").eq("active", true).order("sort_order"),
+        client.from("banners").select("*").eq("is_active", true).order("sort_order")
+      ]);
+
+      const failed = [companyResult, categoriesResult, productsResult, bannersResult].find((result) => result.error);
+      if (failed) throw failed.error;
+
+      const categories = (categoriesResult.data || []).map((row) => ({
+        id: row.slug,
+        dbId: row.id,
+        name: row.name,
+        description: row.description || "",
+        image: row.image_url || "assets/cleaning-bottles.jpg"
+      }));
+      const categoryByDbId = new Map(categories.map((category) => [category.dbId, category.id]));
+      const products = (productsResult.data || []).map((row) => ({
+        id: row.slug,
+        dbId: row.id,
+        name: row.name,
+        code: row.code || "",
+        price: row.price_label || "",
+        categoryId: categoryByDbId.get(row.category_id) || "",
+        image: row.image_url || "assets/cleaning-bottles.jpg",
+        description: row.description || "",
+        featured: Boolean(row.featured),
+        active: row.active !== false
+      }));
+      const banners = (bannersResult.data || []).map((row) => ({
+        id: row.id,
+        title: row.title,
+        subtitle: row.subtitle || "",
+        text: row.body || "",
+        cta: row.cta_label || "Chamar no WhatsApp",
+        ctaUrl: row.cta_url || "",
+        image: row.image_url || "assets/hero-cleaning.jpg"
+      }));
+
+      return {
+        company: mapCompany(companyResult.data, fallback.company),
+        categories: categories.length ? categories : fallback.categories,
+        products: products.length ? products : fallback.products,
+        banners: banners.length ? banners : fallback.banners
+      };
     } catch (error) {
-      console.warn("Não foi possível carregar dados locais.", error);
+      console.warn("Supabase indisponível; usando dados locais.", error);
+      return fallback;
     }
-    return structuredClone(window.BRAVA_SEED);
   }
 
-  function mergeSeedData(storedData) {
-    const seed = structuredClone(window.BRAVA_SEED);
+  function mapCompany(row, fallback) {
+    if (!row) return fallback;
     return {
-      ...seed,
-      ...storedData,
-      company: {
-        ...seed.company,
-        ...(storedData.company || {})
-      },
-      banners: storedData.banners?.length ? storedData.banners : seed.banners,
-      categories: storedData.categories?.length ? storedData.categories : seed.categories,
-      products: storedData.products?.length ? storedData.products : seed.products
+      ...fallback,
+      name: row.name || fallback.name,
+      shortName: row.short_name || fallback.shortName,
+      slogan: row.slogan || fallback.slogan,
+      description: row.description || fallback.description,
+      logo: row.logo_url || fallback.logo,
+      whatsapp: row.whatsapp || fallback.whatsapp,
+      whatsappDisplay: row.whatsapp_display || fallback.whatsappDisplay,
+      whatsappLegacyLink: row.whatsapp_legacy_link || fallback.whatsappLegacyLink,
+      phone: row.phone || fallback.phone,
+      email: row.email || fallback.email,
+      instagram: row.instagram_url || fallback.instagram,
+      address: row.address || fallback.address,
+      mapsUrl: row.maps_url || fallback.mapsUrl,
+      mapsEmbed: row.maps_embed || fallback.mapsEmbed,
+      cnpj: row.cnpj || fallback.cnpj,
+      hours: row.hours || fallback.hours
     };
   }
-
-  function saveData(nextData) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextData));
-  }
-
-  window.BravaStore = {
-    getData: () => structuredClone(state.data),
-    saveData: (nextData) => {
-      state.data = structuredClone(nextData);
-      saveData(state.data);
-    },
-    reset: () => {
-      localStorage.removeItem(STORAGE_KEY);
-      state.data = structuredClone(window.BRAVA_SEED);
-    }
-  };
 
   function renderSharedLayout() {
     const header = document.querySelector("[data-header]");
