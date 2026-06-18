@@ -123,7 +123,6 @@
               <a href="index.html" ${current === "home" ? 'aria-current="page"' : ""}>Início</a>
               <a href="catalogo.html" ${current === "catalog" ? 'aria-current="page"' : ""}>Catálogo</a>
               <a href="contato.html" ${current === "contact" ? 'aria-current="page"' : ""}>Contato</a>
-              <a href="admin.html">Admin</a>
             </nav>
             <div class="header-actions">
               <a class="button whatsapp" href="${whatsappLink()}" target="_blank" rel="noreferrer">WhatsApp</a>
