@@ -8,6 +8,7 @@
       highlight: false
     }
   };
+  const GOOGLE_ADS_CONTACT_CONVERSION = "AW-18269808861/l9B1CMDI8cQcEN3R3IdE";
 
   document.addEventListener("DOMContentLoaded", () => {
     init().catch((error) => console.error("Não foi possível iniciar o site.", error));
@@ -24,6 +25,7 @@
     if (page === "contact") renderContact();
 
     renderProductModal();
+    bindConversionTracking();
   }
 
   async function loadData() {
@@ -69,7 +71,7 @@
         text: row.body || "",
         cta: row.cta_label || "Chamar no WhatsApp",
         ctaUrl: row.cta_url || "",
-        image: row.image_url || "assets/hero-cleaning.jpg"
+        image: row.image_url || "assets/hero-brava-estrutura-4k.jpg"
       }));
 
       return {
@@ -180,6 +182,24 @@
 
     button.addEventListener("click", () => {
       nav.classList.toggle("open");
+    });
+  }
+
+  function bindConversionTracking() {
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest("a.whatsapp");
+      if (!link) return;
+      trackContactConversion();
+    });
+  }
+
+  function trackContactConversion() {
+    if (typeof window.gtag !== "function") return;
+
+    window.gtag("event", "conversion", {
+      send_to: GOOGLE_ADS_CONTACT_CONVERSION,
+      value: 1.0,
+      currency: "BRL"
     });
   }
 
