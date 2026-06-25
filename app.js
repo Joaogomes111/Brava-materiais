@@ -332,6 +332,11 @@
     const target = document.querySelector(selector);
     if (!target) return;
 
+    const isHomeCategories = selector === "[data-home-categories]";
+    if (isHomeCategories && !target.previousElementSibling?.classList.contains("mobile-carousel-hint")) {
+      target.insertAdjacentHTML("beforebegin", '<div class="mobile-carousel-hint">Arraste para o lado e veja mais categorias</div>');
+    }
+
     target.innerHTML = state.data.categories
       .map(
         (category) => `
