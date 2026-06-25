@@ -360,6 +360,14 @@
     const target = document.querySelector(selector);
     if (!target) return;
 
+    const isHomeFeatured = selector === "[data-featured-products]";
+    if (isHomeFeatured && !target.previousElementSibling?.classList.contains("mobile-carousel-hint")) {
+      target.insertAdjacentHTML(
+        "beforebegin",
+        '<div class="mobile-carousel-hint"><span><strong>Produtos em destaque</strong><small>Arraste para o lado e veja mais!</small></span></div>'
+      );
+    }
+
     const products = state.data.products.filter((product) => product.active && product.featured).slice(0, 8);
     target.innerHTML = products.length ? products.map(productCard).join("") : emptyState("Nenhum produto em destaque.");
     bindProductButtons(target);
