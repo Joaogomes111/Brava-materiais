@@ -2,6 +2,7 @@
   const state = {
     data: structuredClone(window.BRAVA_SEED),
     activeBanner: 0,
+    bannerTimer: null,
     filters: {
       category: getQueryParam("categoria") || "todos",
       search: "",
@@ -257,6 +258,7 @@
 
   function renderHome() {
     renderHero();
+    startHeroAutoplay();
     renderCategories("[data-home-categories]");
     renderFeaturedProducts("[data-featured-products]");
     renderCompanyHighlights();
@@ -303,10 +305,27 @@
 
     target.querySelectorAll("[data-banner-index]").forEach((button) => {
       button.addEventListener("click", () => {
-        state.activeBanner = Number(button.dataset.bannerIndex);
-        renderHero();
+        goToBanner(Number(button.dataset.bannerIndex), true);
       });
     });
+  }
+
+  function startHeroAutoplay() {
+    if (state.bannerTimer) window.clearInterval(state.bannerTimer);
+    if (!state.data.banners || state.data.banners.length < 2) return;
+
+    state.bannerTimer = window.setInterval(() => {
+      goToBanner(state.activeBanner + 1);
+    }, 6500);
+  }
+
+  function goToBanner(index, restartTimer = false) {
+    if (!state.data.banners || state.data.banners.length < 2) return;
+
+    state.activeBanner = (index + state.data.banners.length) % state.data.banners.length;
+    renderHero();
+
+    if (restartTimer) startHeroAutoplay();
   }
 
   function renderCategories(selector) {
