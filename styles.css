@@ -698,19 +698,23 @@ h3 {
   gap: 8px;
 }
 
+.footer-icon-link,
 .footer-social-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
+.footer-link-icon,
 .footer-social-icon {
+  flex: 0 0 auto;
   display: inline-flex;
   width: 20px;
   height: 20px;
   color: #ffffff;
 }
 
+.footer-link-icon svg,
 .footer-social-icon svg {
   display: block;
   width: 100%;
@@ -720,6 +724,16 @@ h3 {
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.footer-address {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.footer-address .footer-link-icon {
+  margin-top: 2px;
 }
 
 .footer-map {

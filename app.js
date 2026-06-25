@@ -9,6 +9,7 @@
     }
   };
   const GOOGLE_ADS_CONTACT_CONVERSION = "AW-18269808861/l9B1CMDI8cQcEN3R3IdE";
+  const OFFICIAL_EMAIL = "bravamateriais@hotmail.com";
 
   document.addEventListener("DOMContentLoaded", () => {
     init().catch((error) => console.error("Não foi possível iniciar o site.", error));
@@ -99,7 +100,7 @@
       whatsappDisplay: row.whatsapp_display || fallback.whatsappDisplay,
       whatsappLegacyLink: row.whatsapp_legacy_link || fallback.whatsappLegacyLink,
       phone: row.phone || fallback.phone,
-      email: row.email || fallback.email,
+      email: normalizeCompanyEmail(row.email || fallback.email),
       instagram: row.instagram_url || fallback.instagram,
       address: row.address || fallback.address,
       mapsUrl: row.maps_url || fallback.mapsUrl,
@@ -156,9 +157,32 @@
               <div>
                 <h3>Contato</h3>
                 <div class="footer-contact-list">
-                  <a href="${whatsappLink()}" target="_blank" rel="noreferrer">WhatsApp: ${escapeHtml(state.data.company.whatsappDisplay)}</a>
-                  <a href="tel:${digits(state.data.company.phone)}">Telefone: ${escapeHtml(state.data.company.phone)}</a>
-                  <a href="mailto:${escapeHtml(state.data.company.email)}">E-mail: ${escapeHtml(state.data.company.email)}</a>
+                  <a class="footer-icon-link" href="${whatsappLink()}" target="_blank" rel="noreferrer">
+                    <span class="footer-link-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M4.5 19.5l1.2-4.1A8 8 0 1 1 8.4 18l-3.9 1.5z"></path>
+                        <path d="M9.2 8.9c.2-.5.4-.7.8-.7h.5c.2 0 .4.1.5.4l.7 1.6c.1.3.1.5-.1.7l-.4.5c.5.9 1.2 1.6 2.2 2.1l.5-.4c.2-.2.5-.2.7-.1l1.5.7c.3.1.4.3.4.6v.4c0 .5-.3.9-.8 1.1-.5.2-1.7.1-3.4-.8-1.8-.9-3.1-2.2-3.9-3.9-.7-1.4-.8-2.1-.6-2.6z"></path>
+                      </svg>
+                    </span>
+                    WhatsApp: ${escapeHtml(state.data.company.whatsappDisplay)}
+                  </a>
+                  <a class="footer-icon-link" href="tel:${digits(state.data.company.phone)}">
+                    <span class="footer-link-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M6.6 4.5l2 4.4-1.9 1.4c1.2 2.5 3 4.3 5.5 5.5l1.4-1.9 4.4 2c.5.2.8.8.6 1.3l-.8 2c-.2.5-.7.8-1.2.8C9.8 19.8 4.2 14.2 4 7.4c0-.5.3-1 .8-1.2l2-.8c.5-.2 1.1.1 1.3.6z"></path>
+                      </svg>
+                    </span>
+                    Telefone: ${escapeHtml(state.data.company.phone)}
+                  </a>
+                  <a class="footer-icon-link" href="mailto:${escapeHtml(state.data.company.email)}">
+                    <span class="footer-link-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect>
+                        <path d="M4.5 7l7.5 6 7.5-6"></path>
+                      </svg>
+                    </span>
+                    E-mail: ${escapeHtml(state.data.company.email)}
+                  </a>
                   <a class="footer-social-link" href="${escapeHtml(state.data.company.instagram)}" target="_blank" rel="noreferrer">
                     <span class="footer-social-icon" aria-hidden="true">
                       <svg viewBox="0 0 24 24" focusable="false">
@@ -173,7 +197,15 @@
               </div>
               <div>
                 <h3>Onde nos encontrar</h3>
-                <p>${escapeHtml(state.data.company.address)}</p>
+                <p class="footer-address">
+                  <span class="footer-link-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M12 21s7-6.1 7-11a7 7 0 0 0-14 0c0 4.9 7 11 7 11z"></path>
+                      <circle cx="12" cy="10" r="2.4"></circle>
+                    </svg>
+                  </span>
+                  <span>${escapeHtml(state.data.company.address)}</span>
+                </p>
                 <p>CNPJ: ${escapeHtml(state.data.company.cnpj)}</p>
                 <div class="footer-map">
                   <iframe
@@ -553,6 +585,12 @@
   function productWhatsappLink(product) {
     const message = `Olá, gostaria de fazer um orçamento do produto: ${product.name}${product.code ? ` (${product.code})` : ""}.`;
     return whatsappLink(message);
+  }
+
+  function normalizeCompanyEmail(email) {
+    const value = String(email || "").trim();
+    if (!value || value.toLowerCase() === "materiais.brava@gmail.com") return OFFICIAL_EMAIL;
+    return value;
   }
 
   function getQueryParam(name) {

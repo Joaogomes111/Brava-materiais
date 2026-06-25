@@ -9,7 +9,7 @@ window.BRAVA_SEED = {
     whatsappDisplay: "(47) 99911-8317",
     whatsappLegacyLink: "https://wa.me/message/NXZV2F4M4Z75K1",
     phone: "(47) 3348 9682",
-    email: "materiais.brava@gmail.com",
+    email: "bravamateriais@hotmail.com",
     instagram: "https://www.instagram.com/brava_materiais_de_limpeza/",
     address: "Av. Osvaldo Reis, 2980 Praia Brava, Itajaí - SC",
     mapsUrl:
@@ -483,7 +483,7 @@ window.BRAVA_SEED = {
     "agua-perfumada-via-aroma": "assets/product-spray.png"
   };
 
-  window.BRAVA_SEED.banners[0].image = "assets/hero-cleaning.jpg";
+  window.BRAVA_SEED.banners[0].image = "assets/hero-brava-estrutura-4k.jpg";
 
   window.BRAVA_SEED.categories = window.BRAVA_SEED.categories.map((category) => ({
     ...category,
