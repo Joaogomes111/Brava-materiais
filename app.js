@@ -113,6 +113,8 @@
     const header = document.querySelector("[data-header]");
     const footer = document.querySelector("[data-footer]");
     const current = document.body.dataset.page;
+    const mapsUrl = state.data.company.mapsUrl || window.BRAVA_SEED.company.mapsUrl;
+    const mapsEmbed = state.data.company.mapsEmbed || window.BRAVA_SEED.company.mapsEmbed;
 
     if (header) {
       header.innerHTML = `
@@ -157,13 +159,31 @@
                   <a href="${whatsappLink()}" target="_blank" rel="noreferrer">WhatsApp: ${escapeHtml(state.data.company.whatsappDisplay)}</a>
                   <a href="tel:${digits(state.data.company.phone)}">Telefone: ${escapeHtml(state.data.company.phone)}</a>
                   <a href="mailto:${escapeHtml(state.data.company.email)}">E-mail: ${escapeHtml(state.data.company.email)}</a>
-                  <a href="${escapeHtml(state.data.company.instagram)}" target="_blank" rel="noreferrer">Instagram</a>
+                  <a class="footer-social-link" href="${escapeHtml(state.data.company.instagram)}" target="_blank" rel="noreferrer">
+                    <span class="footer-social-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <circle cx="17.5" cy="6.5" r="1.1"></circle>
+                      </svg>
+                    </span>
+                    Instagram
+                  </a>
                 </div>
               </div>
               <div>
                 <h3>Onde nos encontrar</h3>
                 <p>${escapeHtml(state.data.company.address)}</p>
                 <p>CNPJ: ${escapeHtml(state.data.company.cnpj)}</p>
+                <div class="footer-map">
+                  <iframe
+                    title="Mapa da Brava Materiais de Limpeza"
+                    src="${escapeHtml(mapsEmbed)}"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                  <a href="${escapeHtml(mapsUrl)}" target="_blank" rel="noreferrer">Ver no Google Maps</a>
+                </div>
               </div>
             </div>
             <div class="footer-bottom">
