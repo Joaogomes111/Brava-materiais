@@ -269,13 +269,15 @@
     if (!target) return;
 
     const banner = state.data.banners[state.activeBanner] || state.data.banners[0];
+    const spotlightProducts = state.data.products.filter((product) => product.active && product.featured).slice(0, 3);
     target.innerHTML = `
       <section class="hero">
         <div class="hero-media">
           <img src="${escapeHtml(banner.image)}" alt="${escapeHtml(banner.title)}">
         </div>
         <div class="container">
-          <div>
+          <div class="hero-layout">
+            <div class="hero-copy">
             <div class="eyebrow">${escapeHtml(banner.subtitle)}</div>
             <h1>${escapeHtml(banner.title)}</h1>
             <p>${escapeHtml(banner.text)}</p>
@@ -287,6 +289,32 @@
               <div class="metric"><strong>Casa</strong><span>limpeza para o dia a dia</span></div>
               <div class="metric"><strong>Empresa</strong><span>itens para reposição</span></div>
               <div class="metric"><strong>08h-17h</strong><span>atendimento em dias úteis</span></div>
+            </div>
+            </div>
+            <div class="hero-showcase" aria-label="Produtos e atendimento Brava">
+              <div class="hero-service-card">
+                <span>Distribuidora organizada</span>
+                <strong>Produtos para rotina de limpeza com atendimento direto</strong>
+              </div>
+              ${
+                spotlightProducts.length
+                  ? `<div class="hero-product-stack">
+                      ${spotlightProducts
+                        .map(
+                          (product) => `
+                            <div class="hero-product-mini">
+                              <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">
+                              <div>
+                                <span>${escapeHtml(getCategoryName(product.categoryId))}</span>
+                                <strong>${escapeHtml(product.name)}</strong>
+                              </div>
+                            </div>
+                          `
+                        )
+                        .join("")}
+                    </div>`
+                  : ""
+              }
             </div>
           </div>
         </div>
@@ -334,7 +362,10 @@
 
     const isHomeCategories = selector === "[data-home-categories]";
     if (isHomeCategories && !target.previousElementSibling?.classList.contains("mobile-carousel-hint")) {
-      target.insertAdjacentHTML("beforebegin", '<div class="mobile-carousel-hint">Arraste para o lado e veja mais categorias</div>');
+      target.insertAdjacentHTML(
+        "beforebegin",
+        '<div class="mobile-carousel-hint"><span><strong>Categorias</strong><small>Arraste para o lado e veja mais!</small></span></div>'
+      );
     }
 
     target.innerHTML = state.data.categories
@@ -343,8 +374,10 @@
           <a class="category-card" href="catalogo.html?categoria=${category.id}">
             <img src="${escapeHtml(category.image)}" alt="${escapeHtml(category.name)}">
             <div class="category-card-body">
+              <span class="category-kicker">Categoria</span>
               <h3>${escapeHtml(category.name)}</h3>
               <p>${escapeHtml(category.description)}</p>
+              <span class="category-card-action">Ver produtos</span>
             </div>
           </a>
         `
@@ -371,23 +404,43 @@
           <div class="eyebrow">Por que escolher a Brava</div>
           <h2>Variedade e atendimento direto para sua compra do dia a dia</h2>
           <p class="lead">A Brava atende quem precisa comprar com praticidade, variedade e orientação para escolher os produtos certos.</p>
-          <div class="feature-list">
-            <div class="feature-item">
-              <span class="feature-mark">1</span>
-              <div><h3>Variedade em um só lugar</h3><p>Produtos para limpeza, higiene, descartáveis, papéis, aromatizadores e equipamentos.</p></div>
+          <div class="benefit-grid">
+            <div class="benefit-card">
+              <span class="benefit-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 16V7.5A2.5 2.5 0 0 1 6.5 5H14v11H4z"></path><path d="M14 9h3.5l2.5 3.3V16h-6V9z"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="17" cy="17.5" r="1.5"></circle></svg>
+              </span>
+              <h3>Entrega rápida</h3>
+              <p>Atendimento ágil para ajudar sua rotina a não parar.</p>
             </div>
-            <div class="feature-item">
-              <span class="feature-mark">2</span>
-              <div><h3>Atendimento direto</h3><p>Fale com a equipe pelo WhatsApp para confirmar disponibilidade, valores e melhores opções.</p></div>
+            <div class="benefit-card">
+              <span class="benefit-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 4a7 7 0 0 0-7 7v3"></path><path d="M19 14v-3a7 7 0 0 0-7-7"></path><path d="M5 14h3v4H5z"></path><path d="M16 14h3v4h-3z"></path><path d="M12 20c2 0 3.5-.7 4.2-2"></path></svg>
+              </span>
+              <h3>Atendimento especializado</h3>
+              <p>Orientação direta para encontrar o produto certo.</p>
             </div>
-            <div class="feature-item">
-              <span class="feature-mark">3</span>
-              <div><h3>Compra mais prática</h3><p>Consulte o catálogo por categoria e envie seu pedido de orçamento em poucos cliques.</p></div>
+            <div class="benefit-card">
+              <span class="benefit-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-2.8 8-7 10-4.2-2-7-5.5-7-10V6l7-3z"></path><path d="M9 12l2 2 4-5"></path></svg>
+              </span>
+              <h3>Produtos de qualidade</h3>
+              <p>Itens selecionados para limpeza, higiene e reposição.</p>
+            </div>
+            <div class="benefit-card">
+              <span class="benefit-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg>
+              </span>
+              <h3>Grande variedade</h3>
+              <p>Categorias organizadas para casas, empresas e condomínios.</p>
             </div>
           </div>
         </div>
         <div class="feature-image">
           <img src="assets/hero-equipment.jpg" alt="Equipamentos de limpeza">
+          <div class="feature-image-caption">
+            <strong>Catálogo organizado</strong>
+            <span>Produtos separados por categoria e orçamento via WhatsApp.</span>
+          </div>
         </div>
       </div>
     `;
@@ -517,7 +570,10 @@
           <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" loading="lazy">
         </div>
         <div class="product-body">
-          <span class="product-category">${escapeHtml(categoryName)}</span>
+          <div class="product-topline">
+            <span class="product-category">${escapeHtml(categoryName)}</span>
+            ${product.code ? `<span class="product-code">${escapeHtml(product.code)}</span>` : ""}
+          </div>
           <h3 class="product-title">${escapeHtml(product.name)}</h3>
           <p class="product-description">${escapeHtml(product.description || "Produto disponível para orçamento.")}</p>
           <div class="product-footer">
