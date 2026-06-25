@@ -269,15 +269,13 @@
     if (!target) return;
 
     const banner = state.data.banners[state.activeBanner] || state.data.banners[0];
-    const spotlightProducts = state.data.products.filter((product) => product.active && product.featured).slice(0, 3);
     target.innerHTML = `
       <section class="hero">
         <div class="hero-media">
           <img src="${escapeHtml(banner.image)}" alt="${escapeHtml(banner.title)}">
         </div>
         <div class="container">
-          <div class="hero-layout">
-            <div class="hero-copy">
+          <div class="hero-copy">
             <div class="eyebrow">${escapeHtml(banner.subtitle)}</div>
             <h1>${escapeHtml(banner.title)}</h1>
             <p>${escapeHtml(banner.text)}</p>
@@ -289,32 +287,6 @@
               <div class="metric"><strong>Casa</strong><span>limpeza para o dia a dia</span></div>
               <div class="metric"><strong>Empresa</strong><span>itens para reposição</span></div>
               <div class="metric"><strong>08h-17h</strong><span>atendimento em dias úteis</span></div>
-            </div>
-            </div>
-            <div class="hero-showcase" aria-label="Produtos e atendimento Brava">
-              <div class="hero-service-card">
-                <span>Distribuidora organizada</span>
-                <strong>Produtos para rotina de limpeza com atendimento direto</strong>
-              </div>
-              ${
-                spotlightProducts.length
-                  ? `<div class="hero-product-stack">
-                      ${spotlightProducts
-                        .map(
-                          (product) => `
-                            <div class="hero-product-mini">
-                              <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">
-                              <div>
-                                <span>${escapeHtml(getCategoryName(product.categoryId))}</span>
-                                <strong>${escapeHtml(product.name)}</strong>
-                              </div>
-                            </div>
-                          `
-                        )
-                        .join("")}
-                    </div>`
-                  : ""
-              }
             </div>
           </div>
         </div>
@@ -374,7 +346,6 @@
           <a class="category-card" href="catalogo.html?categoria=${category.id}">
             <img src="${escapeHtml(category.image)}" alt="${escapeHtml(category.name)}">
             <div class="category-card-body">
-              <span class="category-kicker">Categoria</span>
               <h3>${escapeHtml(category.name)}</h3>
               <p>${escapeHtml(category.description)}</p>
               <span class="category-card-action">Ver produtos</span>
