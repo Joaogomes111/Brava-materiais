@@ -46,6 +46,7 @@
       const failed = [companyResult, categoriesResult, productsResult, bannersResult].find((result) => result.error);
       if (failed) throw failed.error;
 
+      const variantsByProductDbId = await loadProductVariants(client);
       const categories = (categoriesResult.data || []).map((row) => ({
         id: row.slug,
         dbId: row.id,
@@ -64,7 +65,8 @@
         image: row.image_url || "assets/cleaning-bottles.jpg",
         description: row.description || "",
         featured: Boolean(row.featured),
-        active: row.active !== false
+        active: row.active !== false,
+        variants: variantsByProductDbId.get(row.id) || []
       }));
       const banners = (bannersResult.data || []).map((row) => ({
         id: row.id,
@@ -85,6 +87,32 @@
     } catch (error) {
       console.warn("Supabase indisponível; usando dados locais.", error);
       return fallback;
+    }
+  }
+
+  async function loadProductVariants(client) {
+    try {
+      const { data: rows, error } = await client.from("product_variants").select("*").eq("active", true).order("sort_order");
+      if (error) throw error;
+
+      return (rows || []).reduce((map, row) => {
+        const variant = {
+          id: row.id,
+          name: row.name,
+          code: row.code || "",
+          price: row.price_label || "",
+          description: row.description || "",
+          active: row.active !== false,
+          sortOrder: row.sort_order || 0
+        };
+        const current = map.get(row.product_id) || [];
+        current.push(variant);
+        map.set(row.product_id, current);
+        return map;
+      }, new Map());
+    } catch (error) {
+      console.warn("Variações de produtos indisponíveis.", error);
+      return new Map();
     }
   }
 
@@ -483,7 +511,12 @@
 
     if (query) {
       products = products.filter((product) => {
-        const haystack = normalize(`${product.name} ${product.description} ${product.code || ""} ${getCategoryName(product.categoryId)}`);
+        const variantText = getProductVariants(product)
+          .map((variant) => `${variant.name} ${variant.code || ""} ${variant.price || ""} ${variant.description || ""}`)
+          .join(" ");
+        const haystack = normalize(
+          `${product.name} ${product.description} ${product.code || ""} ${getCategoryName(product.categoryId)} ${variantText}`
+        );
         return haystack.includes(query);
       });
     }
@@ -542,6 +575,8 @@
 
   function productCard(product) {
     const categoryName = getCategoryName(product.categoryId);
+    const variants = getProductVariants(product);
+    const selectedVariant = variants[0] || null;
     return `
       <article class="product-card">
         <div class="product-media">
@@ -555,11 +590,12 @@
           </div>
           <h3 class="product-title">${escapeHtml(product.name)}</h3>
           <p class="product-description">${escapeHtml(product.description || "Produto disponível para orçamento.")}</p>
+          ${variantPicker(product, selectedVariant)}
           <div class="product-footer">
-            <div class="price">${product.price ? escapeHtml(product.price) : "Sob consulta"}</div>
+            <div class="price" data-product-price-label>${escapeHtml(productPriceLabel(product, selectedVariant))}</div>
             <div class="product-actions">
               <button class="button secondary" type="button" data-product-detail="${escapeHtml(product.id)}">Ver detalhes</button>
-              <a class="button whatsapp" href="${productWhatsappLink(product)}" target="_blank" rel="noreferrer">Pedir orçamento</a>
+              <a class="button whatsapp" data-product-whatsapp="${escapeHtml(product.id)}" href="${productWhatsappLink(product, selectedVariant)}" target="_blank" rel="noreferrer">Pedir orçamento</a>
             </div>
           </div>
         </div>
@@ -570,6 +606,10 @@
   function bindProductButtons(root) {
     root.querySelectorAll("[data-product-detail]").forEach((button) => {
       button.addEventListener("click", () => openProductModal(button.dataset.productDetail));
+    });
+    root.querySelectorAll("[data-product-variant-select]").forEach((select) => {
+      updateVariantTarget(select);
+      select.addEventListener("change", () => updateVariantTarget(select));
     });
   }
 
@@ -594,6 +634,8 @@
 
     const product = state.data.products.find((item) => item.id === productId);
     if (!product) return;
+    const variants = getProductVariants(product);
+    const selectedVariant = variants[0] || null;
 
     modal.innerHTML = `
       <div class="modal-panel" role="dialog" aria-modal="true" aria-label="${escapeHtml(product.name)}">
@@ -607,9 +649,13 @@
             <h2>${escapeHtml(product.name)}</h2>
             <p>${escapeHtml(product.description || "Produto disponível para orçamento.")}</p>
             <p><strong>Código:</strong> ${escapeHtml(product.code || "Não informado")}</p>
-            <p><strong>Valor:</strong> ${product.price ? escapeHtml(product.price) : "Sob consulta"}</p>
+            ${variantPicker(product, selectedVariant)}
+            <p><strong>Valor:</strong> <span data-product-price-label>${escapeHtml(productPriceLabel(product, selectedVariant))}</span></p>
             <div class="hero-actions">
-              <a class="button whatsapp" href="${productWhatsappLink(product)}" target="_blank" rel="noreferrer">Pedir orçamento pelo WhatsApp</a>
+              <a class="button whatsapp" data-product-whatsapp="${escapeHtml(product.id)}" href="${productWhatsappLink(
+                product,
+                selectedVariant
+              )}" target="_blank" rel="noreferrer">Pedir orçamento pelo WhatsApp</a>
               <button class="button secondary" type="button" data-modal-close>Fechar</button>
             </div>
           </div>
@@ -618,6 +664,70 @@
     `;
 
     modal.classList.add("open");
+    bindProductButtons(modal);
+  }
+
+  function variantPicker(product, selectedVariant) {
+    const variants = getProductVariants(product);
+    if (!variants.length) return "";
+
+    if (variants.length === 1) {
+      return `
+        <div class="variant-picker variant-picker-static">
+          <span>Opção</span>
+          <strong>${escapeHtml(variantLabel(selectedVariant || variants[0]))}</strong>
+        </div>
+      `;
+    }
+
+    return `
+      <label class="variant-picker">
+        Escolha a opção
+        <select class="select" data-product-variant-select="${escapeHtml(product.id)}">
+          ${variants
+            .map(
+              (variant) =>
+                `<option value="${escapeHtml(variant.id)}" ${selectedVariant?.id === variant.id ? "selected" : ""}>${escapeHtml(
+                  variantLabel(variant)
+                )}</option>`
+            )
+            .join("")}
+        </select>
+      </label>
+    `;
+  }
+
+  function updateVariantTarget(select) {
+    const product = state.data.products.find((item) => item.id === select.dataset.productVariantSelect);
+    if (!product) return;
+
+    const variant = getProductVariant(product, select.value);
+    const scope = select.closest(".product-card, .modal-panel") || document;
+    const priceTarget = scope.querySelector("[data-product-price-label]");
+    const whatsappTarget = scope.querySelector("[data-product-whatsapp]");
+
+    if (priceTarget) priceTarget.textContent = productPriceLabel(product, variant);
+    if (whatsappTarget) whatsappTarget.href = productWhatsappLink(product, variant);
+  }
+
+  function getProductVariants(product) {
+    return (product.variants || []).filter((variant) => variant && variant.active !== false);
+  }
+
+  function getProductVariant(product, variantId) {
+    return getProductVariants(product).find((variant) => variant.id === variantId) || getProductVariants(product)[0] || null;
+  }
+
+  function productPriceLabel(product, variant) {
+    if (variant?.price) return variant.price;
+    return product.price || "Sob consulta";
+  }
+
+  function variantLabel(variant) {
+    if (!variant) return "Opção do produto";
+    return [variant.name, variant.code ? `Cód. ${variant.code}` : "", variant.price || "", variant.description || ""]
+      .filter(Boolean)
+      .join(" | ");
   }
 
   function sortProducts(products, sort) {
@@ -641,8 +751,13 @@
     return `https://wa.me/${digits(state.data.company.whatsapp)}?text=${encodeURIComponent(defaultMessage)}`;
   }
 
-  function productWhatsappLink(product) {
-    const message = `Olá, gostaria de fazer um orçamento do produto: ${product.name}${product.code ? ` (${product.code})` : ""}.`;
+  function productWhatsappLink(product, variant) {
+    const optionText = variant
+      ? `\nOpção escolhida: ${variant.name}${variant.code ? `\nCódigo da opção: ${variant.code}` : ""}${
+          variant.price ? `\nValor informado: ${variant.price}` : ""
+        }${variant.description ? `\nDetalhe: ${variant.description}` : ""}`
+      : "";
+    const message = `Olá, gostaria de fazer um orçamento do produto: ${product.name}${product.code ? ` (${product.code})` : ""}.${optionText}`;
     return whatsappLink(message);
   }
 

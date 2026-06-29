@@ -47,6 +47,8 @@ create table if not exists public.company_settings (
   email text,
   instagram_url text,
   address text,
+  maps_url text,
+  maps_embed text,
   cnpj text,
   hours text,
   created_at timestamptz not null default now(),
@@ -85,6 +87,19 @@ create table if not exists public.products (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.product_variants (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  name text not null,
+  code text,
+  price_label text,
+  description text,
+  active boolean not null default true,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.banners (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -114,6 +129,11 @@ create trigger set_products_updated_at
 before update on public.products
 for each row execute function public.set_updated_at();
 
+drop trigger if exists set_product_variants_updated_at on public.product_variants;
+create trigger set_product_variants_updated_at
+before update on public.product_variants
+for each row execute function public.set_updated_at();
+
 drop trigger if exists set_banners_updated_at on public.banners;
 create trigger set_banners_updated_at
 before update on public.banners
@@ -123,6 +143,7 @@ alter table public.admin_profiles enable row level security;
 alter table public.company_settings enable row level security;
 alter table public.categories enable row level security;
 alter table public.products enable row level security;
+alter table public.product_variants enable row level security;
 alter table public.banners enable row level security;
 
 drop policy if exists "Admins can read admin profiles" on public.admin_profiles;
@@ -166,6 +187,19 @@ using (active = true or public.is_admin());
 drop policy if exists "Admins can manage products" on public.products;
 create policy "Admins can manage products"
 on public.products for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+drop policy if exists "Public can read active product variants" on public.product_variants;
+create policy "Public can read active product variants"
+on public.product_variants for select
+to anon, authenticated
+using (active = true or public.is_admin());
+
+drop policy if exists "Admins can manage product variants" on public.product_variants;
+create policy "Admins can manage product variants"
+on public.product_variants for all
 to authenticated
 using (public.is_admin())
 with check (public.is_admin());

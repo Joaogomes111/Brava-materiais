@@ -6,7 +6,7 @@
     <title>Painel Administrativo | Brava Materiais de Limpeza</title>
     <meta name="robots" content="noindex">
     <link rel="icon" href="assets/logo-brava-materiais.jpeg">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260629-1">
   </head>
   <body class="admin-body">
     <div class="login-screen" data-login-screen>
@@ -94,6 +94,17 @@
               <label>
                 Descrição
                 <textarea class="textarea" data-product-description required></textarea>
+              </label>
+              <label>
+                Variações / opções do produto
+                <textarea
+                  class="textarea variants-textarea"
+                  data-product-variants
+                  placeholder="Uma por linha: Código | Opção | Preço | Detalhe&#10;5451 | Bamboo 500ml | R$ 36,04 | UN&#10;5452 | Black Vanilla 500ml | R$ 121,74 | UN"
+                ></textarea>
+                <span class="field-help">
+                  Use para fragrâncias, tamanhos, micragem, cor ou qualquer opção com preço/código diferente.
+                </span>
               </label>
               <label class="check-row">
                 <input type="checkbox" data-product-featured>
@@ -250,6 +261,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="data/site-data.js"></script>
-    <script src="admin.js"></script>
+    <script src="admin.js?v=20260629-1"></script>
   </body>
 </html>

@@ -115,6 +115,7 @@
     const failed = [companyResult, categoriesResult, productsResult, bannersResult].find((result) => result.error);
     if (failed) throw failed.error;
 
+    const variantsByProductDbId = await loadProductVariants();
     const categories = (categoriesResult.data || []).map((row) => ({
       id: row.slug,
       dbId: row.id,
@@ -139,7 +140,8 @@
         description: row.description || "",
         featured: Boolean(row.featured),
         active: row.active !== false,
-        sortOrder: row.sort_order || 0
+        sortOrder: row.sort_order || 0,
+        variants: variantsByProductDbId.get(row.id) || []
       })),
       banners: (bannersResult.data || []).map((row) => ({
         id: row.id,
@@ -148,13 +150,39 @@
         text: row.body || "",
         cta: row.cta_label || "Chamar no WhatsApp",
         ctaUrl: row.cta_url || "",
-        image: row.image_url || "assets/hero-cleaning.jpg",
+        image: row.image_url || "assets/hero-brava-estrutura-4k.jpg",
         sortOrder: row.sort_order || 0,
         active: row.is_active !== false
       }))
     };
 
     renderAll();
+  }
+
+  async function loadProductVariants() {
+    try {
+      const { data: rows, error } = await client.from("product_variants").select("*").order("sort_order");
+      if (error) throw error;
+
+      return (rows || []).reduce((map, row) => {
+        const variant = {
+          id: row.id,
+          name: row.name,
+          code: row.code || "",
+          price: row.price_label || "",
+          description: row.description || "",
+          active: row.active !== false,
+          sortOrder: row.sort_order || 0
+        };
+        const current = map.get(row.product_id) || [];
+        current.push(variant);
+        map.set(row.product_id, current);
+        return map;
+      }, new Map());
+    } catch (error) {
+      console.warn("Tabela de variações ainda não disponível.", error);
+      return new Map();
+    }
   }
 
   function mapCompany(row) {
@@ -210,6 +238,7 @@
                   <strong>${escapeHtml(product.name)}</strong>
                   <div style="color: var(--muted); font-size: 0.9rem;">
                     ${escapeHtml(getCategoryName(product.categoryId))} ${product.price ? `| ${escapeHtml(product.price)}` : "| Sob consulta"}
+                    ${product.variants?.length ? `| ${product.variants.length} variação(ões)` : ""}
                     ${product.active ? "" : "| Inativo"}
                   </div>
                 </div>
@@ -259,12 +288,88 @@
       const query = existingSlug
         ? client.from("products").update(payload).eq("slug", existingSlug)
         : client.from("products").insert(payload);
-      const { error } = await query;
+      const { data: savedProduct, error } = await query.select("id, slug").single();
       if (error) throw error;
+      await saveProductVariants(savedProduct?.id || existing?.dbId);
       clearProductForm();
       await refreshData();
       notify(existingSlug ? "Produto atualizado." : "Produto adicionado.");
     });
+  }
+
+  async function saveProductVariants(productDbId) {
+    if (!productDbId) return;
+
+    const variants = parseVariants(value("[data-product-variants]"));
+    const deleteResult = await client.from("product_variants").delete().eq("product_id", productDbId);
+    if (deleteResult.error) {
+      if (isMissingVariantsTable(deleteResult.error) && !variants.length) return;
+      throw new Error("Execute o arquivo supabase/product-variants.sql no Supabase antes de salvar variações.");
+    }
+    if (!variants.length) return;
+
+    const rows = variants.map((variant, index) => ({
+      product_id: productDbId,
+      name: variant.name,
+      code: variant.code || null,
+      price_label: variant.price || null,
+      description: variant.description || null,
+      active: true,
+      sort_order: index + 1
+    }));
+
+    const { error } = await client.from("product_variants").insert(rows);
+    if (error) {
+      if (isMissingVariantsTable(error)) {
+        throw new Error("Execute o arquivo supabase/product-variants.sql no Supabase antes de salvar variações.");
+      }
+      throw error;
+    }
+  }
+
+  function parseVariants(rawText) {
+    return String(rawText || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const parts = splitVariantLine(line);
+        if (parts.length >= 3) {
+          return {
+            code: parts[0],
+            name: parts[1],
+            price: parts[2],
+            description: parts.slice(3).join(" | ")
+          };
+        }
+        if (parts.length === 2) {
+          return {
+            code: "",
+            name: parts[0],
+            price: parts[1],
+            description: ""
+          };
+        }
+        return {
+          code: "",
+          name: parts[0],
+          price: "",
+          description: ""
+        };
+      })
+      .filter((variant) => variant.name);
+  }
+
+  function splitVariantLine(line) {
+    const separator = line.includes("|") ? "|" : line.includes("\t") ? "\t" : ";";
+    return line
+      .split(separator)
+      .map((part) => part.trim())
+      .filter(Boolean);
+  }
+
+  function isMissingVariantsTable(error) {
+    return /product_variants|relation .* does not exist|schema cache/i.test(String(error?.message || error || ""));
   }
 
   function editProduct(id) {
@@ -278,10 +383,17 @@
     setValue("[data-product-category]", product.categoryId);
     setValue("[data-product-image]", product.image);
     setValue("[data-product-description]", product.description);
+    setValue("[data-product-variants]", formatVariants(product.variants));
     qs("[data-product-featured]").checked = Boolean(product.featured);
     qs("[data-product-active]").checked = product.active !== false;
     qs("[data-product-form] h3").textContent = "Editar produto";
     qs("[data-product-name]").focus();
+  }
+
+  function formatVariants(variants) {
+    return (variants || [])
+      .map((variant) => [variant.code || "", variant.name || "", variant.price || "", variant.description || ""].filter(Boolean).join(" | "))
+      .join("\n");
   }
 
   async function deleteProduct(id) {
@@ -439,7 +551,7 @@
         "[data-banner-image]",
         "[data-banner-file]",
         "banners",
-        existing?.image || "assets/hero-cleaning.jpg"
+        existing?.image || "assets/hero-brava-estrutura-4k.jpg"
       );
       const payload = {
         title: value("[data-banner-title]"),
