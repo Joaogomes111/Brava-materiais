@@ -78,12 +78,14 @@
 
     qsa("[data-admin-tab]").forEach((button) => {
       button.addEventListener("click", () => {
-        qsa("[data-admin-tab]").forEach((item) => item.classList.remove("active"));
-        qsa("[data-panel]").forEach((panel) => panel.classList.remove("active"));
-        button.classList.add("active");
-        qs(`[data-panel="${button.dataset.adminTab}"]`)?.classList.add("active");
+        activateAdminTab(button.dataset.adminTab);
       });
     });
+  }
+
+  function activateAdminTab(tabName) {
+    qsa("[data-admin-tab]").forEach((item) => item.classList.toggle("active", item.dataset.adminTab === tabName));
+    qsa("[data-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === tabName));
   }
 
   function bindActions() {
@@ -97,6 +99,8 @@
 
     qs("[data-product-form]")?.addEventListener("submit", saveProduct);
     qs("[data-product-clear]")?.addEventListener("click", clearProductForm);
+    qs("[data-featured-search]")?.addEventListener("input", renderFeaturedProducts);
+    qs("[data-featured-category]")?.addEventListener("change", renderFeaturedProducts);
     qs("[data-category-form]")?.addEventListener("submit", saveCategory);
     qs("[data-category-clear]")?.addEventListener("click", clearCategoryForm);
     qs("[data-banner-form]")?.addEventListener("submit", saveBanner);
@@ -211,6 +215,7 @@
   function renderAll() {
     renderCategorySelect();
     renderProducts();
+    renderFeaturedProducts();
     renderCategories();
     renderBanners();
     fillCompanyForm();
@@ -218,10 +223,22 @@
 
   function renderCategorySelect() {
     const select = qs("[data-product-category]");
-    if (!select) return;
-    select.innerHTML = data.categories
-      .map((category) => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.name)}</option>`)
-      .join("");
+    if (select) {
+      select.innerHTML = data.categories
+        .map((category) => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.name)}</option>`)
+        .join("");
+    }
+
+    const featuredSelect = qs("[data-featured-category]");
+    if (featuredSelect) {
+      const currentValue = featuredSelect.value;
+      featuredSelect.innerHTML =
+        `<option value="">Todas as categorias</option>` +
+        data.categories
+          .map((category) => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.name)}</option>`)
+          .join("");
+      featuredSelect.value = currentValue;
+    }
   }
 
   function renderProducts() {
@@ -239,6 +256,7 @@
                   <div style="color: var(--muted); font-size: 0.9rem;">
                     ${escapeHtml(getCategoryName(product.categoryId))} ${product.price ? `| ${escapeHtml(product.price)}` : "| Sob consulta"}
                     ${product.variants?.length ? `| ${product.variants.length} variação(ões)` : ""}
+                    ${product.featured ? "| Destaque" : ""}
                     ${product.active ? "" : "| Inativo"}
                   </div>
                 </div>
@@ -254,6 +272,89 @@
 
     qsa("[data-edit-product]").forEach((button) => button.addEventListener("click", () => editProduct(button.dataset.editProduct)));
     qsa("[data-delete-product]").forEach((button) => button.addEventListener("click", () => deleteProduct(button.dataset.deleteProduct)));
+  }
+
+  function renderFeaturedProducts() {
+    const target = qs("[data-featured-manager]");
+    if (!target) return;
+
+    const search = value("[data-featured-search]").toLowerCase();
+    const category = value("[data-featured-category]");
+    const featuredCount = data.products.filter((product) => product.featured).length;
+    const countLabel = featuredCount === 1 ? "1 destaque" : `${featuredCount} destaques`;
+    const countTarget = qs("[data-featured-count]");
+    if (countTarget) countTarget.textContent = countLabel;
+
+    const filteredProducts = data.products
+      .filter((product) => {
+        const matchesSearch =
+          !search ||
+          product.name.toLowerCase().includes(search) ||
+          product.code.toLowerCase().includes(search) ||
+          getCategoryName(product.categoryId).toLowerCase().includes(search);
+        const matchesCategory = !category || product.categoryId === category;
+        return matchesSearch && matchesCategory;
+      })
+      .sort((first, second) => Number(second.featured) - Number(first.featured) || first.name.localeCompare(second.name));
+
+    target.innerHTML = filteredProducts.length
+      ? filteredProducts
+          .map(
+            (product) => `
+              <div class="admin-list-item featured-list-item ${product.featured ? "is-featured" : ""}">
+                <img src="${escapeHtml(product.image || PLACEHOLDER_IMAGE)}" alt="${escapeHtml(product.name)}">
+                <div>
+                  <div class="featured-title-row">
+                    <strong>${escapeHtml(product.name)}</strong>
+                    ${product.featured ? `<span class="status-pill">Destaque</span>` : ""}
+                    ${product.active ? "" : `<span class="status-pill muted">Inativo</span>`}
+                  </div>
+                  <div class="admin-muted">
+                    ${escapeHtml(getCategoryName(product.categoryId))}
+                    ${product.code ? `| ${escapeHtml(product.code)}` : ""}
+                    ${product.variants?.length ? `| ${product.variants.length} variação(ões)` : ""}
+                  </div>
+                </div>
+                <div class="admin-list-actions">
+                  <button
+                    class="small-button ${product.featured ? "danger" : "success"}"
+                    type="button"
+                    data-toggle-featured="${escapeHtml(product.id)}"
+                    data-next-featured="${product.featured ? "false" : "true"}"
+                  >
+                    ${product.featured ? "Retirar" : "Destacar"}
+                  </button>
+                  <button class="small-button" type="button" data-edit-featured-product="${escapeHtml(product.id)}">Editar</button>
+                </div>
+              </div>
+            `
+          )
+          .join("")
+      : `<div class="empty">Nenhum produto encontrado.</div>`;
+
+    qsa("[data-toggle-featured]").forEach((button) =>
+      button.addEventListener("click", () => toggleFeaturedProduct(button.dataset.toggleFeatured, button.dataset.nextFeatured === "true"))
+    );
+    qsa("[data-edit-featured-product]").forEach((button) =>
+      button.addEventListener("click", () => {
+        activateAdminTab("products");
+        editProduct(button.dataset.editFeaturedProduct);
+      })
+    );
+  }
+
+  async function toggleFeaturedProduct(id, featured) {
+    const product = data.products.find((item) => item.id === id);
+    if (!product) return;
+
+    try {
+      const { error } = await client.from("products").update({ featured }).eq("slug", id);
+      if (error) throw error;
+      await refreshData();
+      notify(featured ? `"${product.name}" entrou nos destaques.` : `"${product.name}" saiu dos destaques.`);
+    } catch (error) {
+      notify(readableError(error), true);
+    }
   }
 
   async function saveProduct(event) {

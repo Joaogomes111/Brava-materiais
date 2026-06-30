@@ -6,7 +6,7 @@
     <title>Painel Administrativo | Brava Materiais de Limpeza</title>
     <meta name="robots" content="noindex">
     <link rel="icon" href="assets/logo-brava-materiais.jpeg">
-    <link rel="stylesheet" href="styles.css?v=20260629-1">
+    <link rel="stylesheet" href="styles.css?v=20260630-1">
   </head>
   <body class="admin-body">
     <div class="login-screen" data-login-screen>
@@ -37,6 +37,7 @@
         <img src="assets/logo-brava-materiais.jpeg" alt="Brava Materiais de Limpeza">
         <nav class="admin-nav" aria-label="Menu do painel">
           <button type="button" class="active" data-admin-tab="products">Produtos</button>
+          <button type="button" data-admin-tab="featured">Destaques</button>
           <button type="button" data-admin-tab="categories">Categorias</button>
           <button type="button" data-admin-tab="banners">Banners</button>
           <button type="button" data-admin-tab="company">Empresa</button>
@@ -122,6 +123,33 @@
               <h3>Produtos cadastrados</h3>
               <div class="admin-list" data-product-list></div>
             </div>
+          </div>
+        </section>
+
+        <section class="admin-panel" data-panel="featured">
+          <div class="admin-card featured-manager">
+            <div class="admin-card-header">
+              <div>
+                <h3>Produtos em destaque</h3>
+                <p class="admin-muted">
+                  Veja todos os produtos marcados na home e altere os destaques sem abrir cada produto.
+                </p>
+              </div>
+              <div class="featured-count" data-featured-count>0 destaques</div>
+            </div>
+
+            <div class="featured-tools">
+              <label>
+                Buscar produto
+                <input class="field" data-featured-search placeholder="Digite o nome do produto">
+              </label>
+              <label>
+                Filtrar por categoria
+                <select class="select" data-featured-category></select>
+              </label>
+            </div>
+
+            <div class="admin-list featured-list" data-featured-manager></div>
           </div>
         </section>
 
@@ -261,6 +289,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="data/site-data.js"></script>
-    <script src="admin.js?v=20260629-1"></script>
+    <script src="admin.js?v=20260630-1"></script>
   </body>
 </html>
