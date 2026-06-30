@@ -100,6 +100,20 @@ create table if not exists public.product_variants (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.product_categories (
+  product_id uuid not null references public.products(id) on delete cascade,
+  category_id uuid not null references public.categories(id) on delete cascade,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  primary key (product_id, category_id)
+);
+
+create index if not exists product_categories_category_id_idx
+on public.product_categories(category_id);
+
+create index if not exists product_categories_product_id_idx
+on public.product_categories(product_id);
+
 create table if not exists public.banners (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -144,6 +158,7 @@ alter table public.company_settings enable row level security;
 alter table public.categories enable row level security;
 alter table public.products enable row level security;
 alter table public.product_variants enable row level security;
+alter table public.product_categories enable row level security;
 alter table public.banners enable row level security;
 
 drop policy if exists "Admins can read admin profiles" on public.admin_profiles;
@@ -200,6 +215,26 @@ using (active = true or public.is_admin());
 drop policy if exists "Admins can manage product variants" on public.product_variants;
 create policy "Admins can manage product variants"
 on public.product_variants for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+drop policy if exists "Public can read product categories" on public.product_categories;
+create policy "Public can read product categories"
+on public.product_categories for select
+to anon, authenticated
+using (
+  exists (
+    select 1
+    from public.products p
+    where p.id = product_id
+      and (p.active = true or public.is_admin())
+  )
+);
+
+drop policy if exists "Admins can manage product categories" on public.product_categories;
+create policy "Admins can manage product categories"
+on public.product_categories for all
 to authenticated
 using (public.is_admin())
 with check (public.is_admin());

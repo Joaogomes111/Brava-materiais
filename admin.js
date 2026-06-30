@@ -129,24 +129,12 @@
       sortOrder: row.sort_order || 0
     }));
     const categoryByDbId = new Map(categories.map((category) => [category.dbId, category.id]));
+    const categoryIdsByProductDbId = await loadProductCategories(categoryByDbId);
 
     data = {
       company: mapCompany(companyResult.data),
       categories,
-      products: (productsResult.data || []).map((row) => ({
-        id: row.slug,
-        dbId: row.id,
-        name: row.name,
-        code: row.code || "",
-        price: row.price_label || "",
-        categoryId: categoryByDbId.get(row.category_id) || "",
-        image: row.image_url || PLACEHOLDER_IMAGE,
-        description: row.description || "",
-        featured: Boolean(row.featured),
-        active: row.active !== false,
-        sortOrder: row.sort_order || 0,
-        variants: variantsByProductDbId.get(row.id) || []
-      })),
+      products: (productsResult.data || []).map((row) => mapProductRow(row, categoryByDbId, categoryIdsByProductDbId, variantsByProductDbId)),
       banners: (bannersResult.data || []).map((row) => ({
         id: row.id,
         title: row.title,
@@ -189,6 +177,47 @@
     }
   }
 
+  async function loadProductCategories(categoryByDbId) {
+    try {
+      const { data: rows, error } = await client.from("product_categories").select("product_id, category_id, sort_order").order("sort_order");
+      if (error) throw error;
+
+      return (rows || []).reduce((map, row) => {
+        const categoryId = categoryByDbId.get(row.category_id);
+        if (!categoryId) return map;
+        const current = map.get(row.product_id) || [];
+        if (!current.includes(categoryId)) current.push(categoryId);
+        map.set(row.product_id, current);
+        return map;
+      }, new Map());
+    } catch (error) {
+      console.warn("Tabela de categorias adicionais ainda nao disponivel.", error);
+      return new Map();
+    }
+  }
+
+  function mapProductRow(row, categoryByDbId, categoryIdsByProductDbId, variantsByProductDbId) {
+    const primaryCategoryId = categoryByDbId.get(row.category_id) || "";
+    const linkedCategoryIds = categoryIdsByProductDbId.get(row.id) || [];
+    const categoryIds = uniqueValues([primaryCategoryId, ...linkedCategoryIds].filter(Boolean));
+
+    return {
+      id: row.slug,
+      dbId: row.id,
+      name: row.name,
+      code: row.code || "",
+      price: row.price_label || "",
+      categoryId: categoryIds[0] || primaryCategoryId,
+      categoryIds,
+      image: row.image_url || PLACEHOLDER_IMAGE,
+      description: row.description || "",
+      featured: Boolean(row.featured),
+      active: row.active !== false,
+      sortOrder: row.sort_order || 0,
+      variants: variantsByProductDbId.get(row.id) || []
+    };
+  }
+
   function mapCompany(row) {
     const fallback = window.BRAVA_SEED.company;
     return {
@@ -222,11 +251,20 @@
   }
 
   function renderCategorySelect() {
-    const select = qs("[data-product-category]");
-    if (select) {
-      select.innerHTML = data.categories
-        .map((category) => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.name)}</option>`)
+    const checklist = qs("[data-product-categories]");
+    if (checklist) {
+      const selectedValues = getSelectedProductCategoryIds();
+      checklist.innerHTML = data.categories
+        .map(
+          (category) => `
+            <label class="category-check">
+              <input type="checkbox" value="${escapeHtml(category.id)}" data-product-category-option>
+              <span>${escapeHtml(category.name)}</span>
+            </label>
+          `
+        )
         .join("");
+      setSelectedProductCategoryIds(selectedValues);
     }
 
     const featuredSelect = qs("[data-featured-category]");
@@ -254,7 +292,7 @@
                 <div>
                   <strong>${escapeHtml(product.name)}</strong>
                   <div style="color: var(--muted); font-size: 0.9rem;">
-                    ${escapeHtml(getCategoryName(product.categoryId))} ${product.price ? `| ${escapeHtml(product.price)}` : "| Sob consulta"}
+                    ${escapeHtml(getProductCategoryNames(product).join(", "))} ${product.price ? `| ${escapeHtml(product.price)}` : "| Sob consulta"}
                     ${product.variants?.length ? `| ${product.variants.length} variação(ões)` : ""}
                     ${product.featured ? "| Destaque" : ""}
                     ${product.active ? "" : "| Inativo"}
@@ -291,8 +329,8 @@
           !search ||
           product.name.toLowerCase().includes(search) ||
           product.code.toLowerCase().includes(search) ||
-          getCategoryName(product.categoryId).toLowerCase().includes(search);
-        const matchesCategory = !category || product.categoryId === category;
+          getProductCategoryNames(product).join(" ").toLowerCase().includes(search);
+        const matchesCategory = !category || productHasCategory(product, category);
         return matchesSearch && matchesCategory;
       })
       .sort((first, second) => Number(second.featured) - Number(first.featured) || first.name.localeCompare(second.name));
@@ -310,7 +348,7 @@
                     ${product.active ? "" : `<span class="status-pill muted">Inativo</span>`}
                   </div>
                   <div class="admin-muted">
-                    ${escapeHtml(getCategoryName(product.categoryId))}
+                    ${escapeHtml(getProductCategoryNames(product).join(", "))}
                     ${product.code ? `| ${escapeHtml(product.code)}` : ""}
                     ${product.variants?.length ? `| ${product.variants.length} variação(ões)` : ""}
                   </div>
@@ -391,11 +429,39 @@
         : client.from("products").insert(payload);
       const { data: savedProduct, error } = await query.select("id, slug").single();
       if (error) throw error;
-      await saveProductVariants(savedProduct?.id || existing?.dbId);
+      const productDbId = savedProduct?.id || existing?.dbId;
+      await saveProductCategoryLinks(productDbId, getSelectedProductCategories());
+      await saveProductVariants(productDbId);
       clearProductForm();
       await refreshData();
       notify(existingSlug ? "Produto atualizado." : "Produto adicionado.");
     });
+  }
+
+  async function saveProductCategoryLinks(productDbId, categories) {
+    if (!productDbId) return;
+    const selectedCategories = categories?.length ? categories : getSelectedProductCategories();
+    const deleteResult = await client.from("product_categories").delete().eq("product_id", productDbId);
+    if (deleteResult.error) {
+      if (isMissingProductCategoriesTable(deleteResult.error) && selectedCategories.length <= 1) return;
+      throw new Error("Execute o arquivo supabase/product-categories.sql no Supabase antes de salvar varias categorias.");
+    }
+
+    if (!selectedCategories.length) return;
+
+    const rows = selectedCategories.map((category, index) => ({
+      product_id: productDbId,
+      category_id: category.dbId,
+      sort_order: index + 1
+    }));
+
+    const { error } = await client.from("product_categories").insert(rows);
+    if (error) {
+      if (isMissingProductCategoriesTable(error)) {
+        throw new Error("Execute o arquivo supabase/product-categories.sql no Supabase antes de salvar varias categorias.");
+      }
+      throw error;
+    }
   }
 
   async function saveProductVariants(productDbId) {
@@ -473,6 +539,10 @@
     return /product_variants|relation .* does not exist|schema cache/i.test(String(error?.message || error || ""));
   }
 
+  function isMissingProductCategoriesTable(error) {
+    return /product_categories|relation .* does not exist|schema cache/i.test(String(error?.message || error || ""));
+  }
+
   function editProduct(id) {
     const product = data.products.find((item) => item.id === id);
     if (!product) return;
@@ -481,7 +551,7 @@
     setValue("[data-product-name]", product.name);
     setValue("[data-product-code]", product.code);
     setValue("[data-product-price]", product.price);
-    setValue("[data-product-category]", product.categoryId);
+    setSelectedProductCategoryIds(getProductCategoryIds(product));
     setValue("[data-product-image]", product.image);
     setValue("[data-product-description]", product.description);
     setValue("[data-product-variants]", formatVariants(product.variants));
@@ -514,6 +584,7 @@
   function clearProductForm() {
     qs("[data-product-form]")?.reset();
     setValue("[data-product-id]", "");
+    setSelectedProductCategoryIds([]);
     qs("[data-product-active]").checked = true;
     qs("[data-product-form] h3").textContent = "Novo produto";
   }
@@ -799,11 +870,45 @@
   }
 
   function countProducts(categoryId) {
-    return data.products.filter((product) => product.categoryId === categoryId).length;
+    return data.products.filter((product) => productHasCategory(product, categoryId)).length;
   }
 
   function getCategoryName(id) {
     return data.categories.find((category) => category.id === id)?.name || "Sem categoria";
+  }
+
+  function getProductCategoryIds(product) {
+    if (Array.isArray(product.categoryIds) && product.categoryIds.length) return product.categoryIds;
+    return product.categoryId ? [product.categoryId] : [];
+  }
+
+  function productHasCategory(product, categoryId) {
+    return getProductCategoryIds(product).includes(categoryId);
+  }
+
+  function getProductCategoryNames(product) {
+    const names = getProductCategoryIds(product).map(getCategoryName).filter(Boolean);
+    return names.length ? uniqueValues(names) : ["Sem categoria"];
+  }
+
+  function getSelectedProductCategoryIds() {
+    return qsa("[data-product-category-option]:checked").map((input) => input.value);
+  }
+
+  function getSelectedProductCategories() {
+    const selectedIds = getSelectedProductCategoryIds();
+    return selectedIds.map((id) => data.categories.find((category) => category.id === id)).filter(Boolean);
+  }
+
+  function setSelectedProductCategoryIds(categoryIds) {
+    const selectedIds = new Set(categoryIds || []);
+    qsa("[data-product-category-option]").forEach((input) => {
+      input.checked = selectedIds.has(input.value);
+    });
+  }
+
+  function uniqueValues(values) {
+    return [...new Set(values)];
   }
 
   function uniqueSlug(name, items) {
@@ -861,6 +966,7 @@
   }
 
   function value(selector) {
+    if (selector === "[data-product-category]") return getSelectedProductCategoryIds()[0] || "";
     return qs(selector)?.value.trim() || "";
   }
 

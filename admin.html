@@ -6,7 +6,7 @@
     <title>Painel Administrativo | Brava Materiais de Limpeza</title>
     <meta name="robots" content="noindex">
     <link rel="icon" href="assets/logo-brava-materiais.jpeg">
-    <link rel="stylesheet" href="styles.css?v=20260630-1">
+    <link rel="stylesheet" href="styles.css?v=20260630-2">
   </head>
   <body class="admin-body">
     <div class="login-screen" data-login-screen>
@@ -81,8 +81,11 @@
                 </label>
               </div>
               <label>
-                Categoria
-                <select class="select" data-product-category required></select>
+                Categorias
+                <div class="category-checklist" data-product-categories></div>
+                <span class="field-help">
+                  Marque uma ou mais categorias. A primeira marcada fica como categoria principal do produto.
+                </span>
               </label>
               <label>
                 URL da imagem
@@ -289,6 +292,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="data/site-data.js"></script>
-    <script src="admin.js?v=20260630-1"></script>
+    <script src="admin.js?v=20260630-2"></script>
   </body>
 </html>

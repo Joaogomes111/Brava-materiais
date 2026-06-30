@@ -55,18 +55,9 @@
         image: row.image_url || "assets/cleaning-bottles.jpg"
       }));
       const categoryByDbId = new Map(categories.map((category) => [category.dbId, category.id]));
+      const categoryIdsByProductDbId = await loadProductCategories(client, categoryByDbId);
       const products = (productsResult.data || []).map((row) => ({
-        id: row.slug,
-        dbId: row.id,
-        name: row.name,
-        code: row.code || "",
-        price: row.price_label || "",
-        categoryId: categoryByDbId.get(row.category_id) || "",
-        image: row.image_url || "assets/cleaning-bottles.jpg",
-        description: row.description || "",
-        featured: Boolean(row.featured),
-        active: row.active !== false,
-        variants: variantsByProductDbId.get(row.id) || []
+        ...mapProductRow(row, categoryByDbId, categoryIdsByProductDbId, variantsByProductDbId)
       }));
       const banners = (bannersResult.data || []).map((row) => ({
         id: row.id,
@@ -114,6 +105,46 @@
       console.warn("Variações de produtos indisponíveis.", error);
       return new Map();
     }
+  }
+
+  async function loadProductCategories(client, categoryByDbId) {
+    try {
+      const { data: rows, error } = await client.from("product_categories").select("product_id, category_id, sort_order").order("sort_order");
+      if (error) throw error;
+
+      return (rows || []).reduce((map, row) => {
+        const categoryId = categoryByDbId.get(row.category_id);
+        if (!categoryId) return map;
+        const current = map.get(row.product_id) || [];
+        if (!current.includes(categoryId)) current.push(categoryId);
+        map.set(row.product_id, current);
+        return map;
+      }, new Map());
+    } catch (error) {
+      console.warn("Categorias adicionais de produtos indisponiveis.", error);
+      return new Map();
+    }
+  }
+
+  function mapProductRow(row, categoryByDbId, categoryIdsByProductDbId, variantsByProductDbId) {
+    const primaryCategoryId = categoryByDbId.get(row.category_id) || "";
+    const linkedCategoryIds = categoryIdsByProductDbId.get(row.id) || [];
+    const categoryIds = uniqueValues([primaryCategoryId, ...linkedCategoryIds].filter(Boolean));
+
+    return {
+      id: row.slug,
+      dbId: row.id,
+      name: row.name,
+      code: row.code || "",
+      price: row.price_label || "",
+      categoryId: categoryIds[0] || primaryCategoryId,
+      categoryIds,
+      image: row.image_url || "assets/cleaning-bottles.jpg",
+      description: row.description || "",
+      featured: Boolean(row.featured),
+      active: row.active !== false,
+      variants: variantsByProductDbId.get(row.id) || []
+    };
   }
 
   function mapCompany(row, fallback) {
@@ -506,7 +537,7 @@
     let products = state.data.products.filter((product) => product.active);
 
     if (state.filters.category !== "todos") {
-      products = products.filter((product) => product.categoryId === state.filters.category);
+      products = products.filter((product) => productHasCategory(product, state.filters.category));
     }
 
     if (query) {
@@ -515,7 +546,7 @@
           .map((variant) => `${variant.name} ${variant.code || ""} ${variant.price || ""} ${variant.description || ""}`)
           .join(" ");
         const haystack = normalize(
-          `${product.name} ${product.description} ${product.code || ""} ${getCategoryName(product.categoryId)} ${variantText}`
+          `${product.name} ${product.description} ${product.code || ""} ${getProductCategoryNames(product).join(" ")} ${variantText}`
         );
         return haystack.includes(query);
       });
@@ -574,7 +605,7 @@
   }
 
   function productCard(product) {
-    const categoryName = getCategoryName(product.categoryId);
+    const categoryName = getProductPrimaryCategoryName(product);
     const variants = getProductVariants(product);
     const selectedVariant = variants[0] || null;
     return `
@@ -645,7 +676,7 @@
           </div>
           <div class="modal-content">
             <button class="modal-close" type="button" data-modal-close aria-label="Fechar">×</button>
-            <span class="product-category">${escapeHtml(getCategoryName(product.categoryId))}</span>
+            <span class="product-category">${escapeHtml(getProductCategoryNames(product).join(", "))}</span>
             <h2>${escapeHtml(product.name)}</h2>
             <p>${escapeHtml(product.description || "Produto disponível para orçamento.")}</p>
             <p><strong>Código:</strong> ${escapeHtml(product.code || "Não informado")}</p>
@@ -733,9 +764,27 @@
   function sortProducts(products, sort) {
     const copy = [...products];
     if (sort === "name") copy.sort((a, b) => a.name.localeCompare(b.name));
-    if (sort === "category") copy.sort((a, b) => getCategoryName(a.categoryId).localeCompare(getCategoryName(b.categoryId)));
+    if (sort === "category") copy.sort((a, b) => getProductPrimaryCategoryName(a).localeCompare(getProductPrimaryCategoryName(b)));
     if (sort === "featured") copy.sort((a, b) => Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name));
     return copy;
+  }
+
+  function getProductCategoryIds(product) {
+    if (Array.isArray(product.categoryIds) && product.categoryIds.length) return product.categoryIds;
+    return product.categoryId ? [product.categoryId] : [];
+  }
+
+  function productHasCategory(product, categoryId) {
+    return getProductCategoryIds(product).includes(categoryId);
+  }
+
+  function getProductCategoryNames(product) {
+    const names = getProductCategoryIds(product).map(getCategoryName).filter(Boolean);
+    return names.length ? uniqueValues(names) : ["Sem categoria"];
+  }
+
+  function getProductPrimaryCategoryName(product) {
+    return getProductCategoryNames(product)[0] || "Sem categoria";
   }
 
   function getCategory(id) {
@@ -781,6 +830,10 @@
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
       .trim();
+  }
+
+  function uniqueValues(values) {
+    return [...new Set(values)];
   }
 
   function escapeHtml(value) {
