@@ -492,6 +492,6 @@ window.BRAVA_SEED = {
 
   window.BRAVA_SEED.products = window.BRAVA_SEED.products.map((product) => ({
     ...product,
-    image: productImages[product.id] || categoryImages[product.categoryId] || "assets/cleaning-bottles.jpg"
+    image: productImages[product.id] || "assets/brava-materiais-perfil-instagram.png"
   }));
 })();

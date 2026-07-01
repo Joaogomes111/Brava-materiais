@@ -11,6 +11,18 @@
   };
   const GOOGLE_ADS_CONTACT_CONVERSION = "AW-18269808861/l9B1CMDI8cQcEN3R3IdE";
   const OFFICIAL_EMAIL = "bravamateriais@hotmail.com";
+  const PRODUCT_PLACEHOLDER_IMAGE = "assets/brava-materiais-perfil-instagram.png";
+  const GENERIC_PRODUCT_IMAGES = new Set([
+    "assets/cleaning-bottles.jpg",
+    "assets/category-produtos-limpeza.jpg",
+    "assets/category-descartaveis.jpg",
+    "assets/category-equipamentos.jpg",
+    "assets/category-papeis-panos.jpg",
+    "assets/category-aromatizadores.jpg",
+    "assets/category-banheiro.jpg",
+    "assets/category-cozinha.jpg",
+    "assets/category-diversos.jpg"
+  ]);
 
   document.addEventListener("DOMContentLoaded", () => {
     init().catch((error) => console.error("Não foi possível iniciar o site.", error));
@@ -139,7 +151,7 @@
       price: row.price_label || "",
       categoryId: categoryIds[0] || primaryCategoryId,
       categoryIds,
-      image: row.image_url || "assets/cleaning-bottles.jpg",
+      image: productImage(row.image_url),
       description: row.description || "",
       featured: Boolean(row.featured),
       active: row.active !== false,
@@ -168,6 +180,12 @@
       cnpj: row.cnpj || fallback.cnpj,
       hours: row.hours || fallback.hours
     };
+  }
+
+  function productImage(imageUrl) {
+    const cleanUrl = (imageUrl || "").trim();
+    if (!cleanUrl || GENERIC_PRODUCT_IMAGES.has(cleanUrl)) return PRODUCT_PLACEHOLDER_IMAGE;
+    return cleanUrl;
   }
 
   function renderSharedLayout() {

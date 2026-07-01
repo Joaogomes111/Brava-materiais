@@ -1,7 +1,19 @@
 (function () {
   const client = window.bravaSupabase;
   const bucket = window.BRAVA_SUPABASE_CONFIG?.bucket || "catalog";
-  const PLACEHOLDER_IMAGE = "assets/cleaning-bottles.jpg";
+  const PLACEHOLDER_IMAGE = "assets/brava-materiais-perfil-instagram.png";
+  const CATEGORY_PLACEHOLDER_IMAGE = "assets/cleaning-bottles.jpg";
+  const GENERIC_PRODUCT_IMAGES = new Set([
+    "assets/cleaning-bottles.jpg",
+    "assets/category-produtos-limpeza.jpg",
+    "assets/category-descartaveis.jpg",
+    "assets/category-equipamentos.jpg",
+    "assets/category-papeis-panos.jpg",
+    "assets/category-aromatizadores.jpg",
+    "assets/category-banheiro.jpg",
+    "assets/category-cozinha.jpg",
+    "assets/category-diversos.jpg"
+  ]);
 
   let data = {
     company: structuredClone(window.BRAVA_SEED.company),
@@ -126,7 +138,7 @@
       dbId: row.id,
       name: row.name,
       description: row.description || "",
-      image: row.image_url || PLACEHOLDER_IMAGE,
+        image: row.image_url || CATEGORY_PLACEHOLDER_IMAGE,
       sortOrder: row.sort_order || 0
     }));
     const categoryByDbId = new Map(categories.map((category) => [category.dbId, category.id]));
@@ -210,7 +222,7 @@
       price: row.price_label || "",
       categoryId: categoryIds[0] || primaryCategoryId,
       categoryIds,
-      image: row.image_url || PLACEHOLDER_IMAGE,
+      image: productImage(row.image_url),
       description: row.description || "",
       featured: Boolean(row.featured),
       active: row.active !== false,
@@ -240,6 +252,12 @@
       cnpj: row.cnpj || fallback.cnpj,
       hours: row.hours || fallback.hours
     };
+  }
+
+  function productImage(imageUrl) {
+    const cleanUrl = (imageUrl || "").trim();
+    if (!cleanUrl || GENERIC_PRODUCT_IMAGES.has(cleanUrl)) return PLACEHOLDER_IMAGE;
+    return cleanUrl;
   }
 
   function renderAll() {
@@ -628,7 +646,7 @@
           .map(
             (category) => `
               <div class="admin-list-item">
-                <img src="${escapeHtml(category.image || PLACEHOLDER_IMAGE)}" alt="${escapeHtml(category.name)}">
+                <img src="${escapeHtml(category.image || CATEGORY_PLACEHOLDER_IMAGE)}" alt="${escapeHtml(category.name)}">
                 <div>
                   <strong>${escapeHtml(category.name)}</strong>
                   <div style="color: var(--muted); font-size: 0.9rem;">${countProducts(category.id)} produtos vinculados</div>
@@ -658,7 +676,7 @@
         "[data-category-image]",
         "[data-category-file]",
         "categories",
-        existing?.image || PLACEHOLDER_IMAGE
+        existing?.image || CATEGORY_PLACEHOLDER_IMAGE
       );
       const payload = {
         slug: existingSlug || uniqueSlug(name, data.categories),
