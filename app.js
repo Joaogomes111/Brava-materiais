@@ -756,9 +756,7 @@
 
   function variantLabel(variant) {
     if (!variant) return "Opção do produto";
-    return [variant.name, variant.code ? `Cód. ${variant.code}` : "", variant.price || "", variant.description || ""]
-      .filter(Boolean)
-      .join(" | ");
+    return variant.name || "Opção do produto";
   }
 
   function sortProducts(products, sort) {
