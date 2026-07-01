@@ -6,7 +6,7 @@
     <title>Painel Administrativo | Brava Materiais de Limpeza</title>
     <meta name="robots" content="noindex">
     <link rel="icon" href="assets/logo-brava-materiais.jpeg">
-    <link rel="stylesheet" href="styles.css?v=20260630-2">
+    <link rel="stylesheet" href="styles.css?v=20260701-1">
   </head>
   <body class="admin-body">
     <div class="login-screen" data-login-screen>
@@ -123,7 +123,19 @@
             </form>
 
             <div class="admin-card">
-              <h3>Produtos cadastrados</h3>
+              <div class="admin-card-header">
+                <div>
+                  <h3>Produtos cadastrados</h3>
+                  <p class="admin-muted">Busque por nome, código, categoria, descrição ou variação.</p>
+                </div>
+                <div class="featured-count" data-product-count>0 produtos</div>
+              </div>
+              <div class="product-tools">
+                <label>
+                  Buscar produto
+                  <input class="field" data-product-search placeholder="Digite o produto que deseja editar">
+                </label>
+              </div>
               <div class="admin-list" data-product-list></div>
             </div>
           </div>
@@ -292,6 +304,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="data/site-data.js"></script>
-    <script src="admin.js?v=20260630-2"></script>
+    <script src="admin.js?v=20260701-1"></script>
   </body>
 </html>

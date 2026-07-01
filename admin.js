@@ -99,6 +99,7 @@
 
     qs("[data-product-form]")?.addEventListener("submit", saveProduct);
     qs("[data-product-clear]")?.addEventListener("click", clearProductForm);
+    qs("[data-product-search]")?.addEventListener("input", renderProducts);
     qs("[data-featured-search]")?.addEventListener("input", renderFeaturedProducts);
     qs("[data-featured-category]")?.addEventListener("change", renderFeaturedProducts);
     qs("[data-category-form]")?.addEventListener("submit", saveCategory);
@@ -283,8 +284,17 @@
     const target = qs("[data-product-list]");
     if (!target) return;
 
-    target.innerHTML = data.products.length
-      ? data.products
+    const search = normalizeText(value("[data-product-search]"));
+    const filteredProducts = data.products.filter((product) => productMatchesSearch(product, search));
+    const countTarget = qs("[data-product-count]");
+    if (countTarget) {
+      countTarget.textContent = search
+        ? `${filteredProducts.length} de ${data.products.length} produtos`
+        : `${data.products.length} produtos`;
+    }
+
+    target.innerHTML = filteredProducts.length
+      ? filteredProducts
           .map(
             (product) => `
               <div class="admin-list-item">
@@ -306,10 +316,30 @@
             `
           )
           .join("")
-      : `<div class="empty">Nenhum produto cadastrado.</div>`;
+      : `<div class="empty">${search ? "Nenhum produto encontrado para essa busca." : "Nenhum produto cadastrado."}</div>`;
 
     qsa("[data-edit-product]").forEach((button) => button.addEventListener("click", () => editProduct(button.dataset.editProduct)));
     qsa("[data-delete-product]").forEach((button) => button.addEventListener("click", () => deleteProduct(button.dataset.deleteProduct)));
+  }
+
+  function productMatchesSearch(product, search) {
+    if (!search) return true;
+
+    const variantsText = (product.variants || [])
+      .map((variant) => [variant.name, variant.code, variant.price, variant.description].filter(Boolean).join(" "))
+      .join(" ");
+    const productText = [
+      product.name,
+      product.code,
+      product.price,
+      product.description,
+      getProductCategoryNames(product).join(" "),
+      product.featured ? "destaque" : "",
+      product.active ? "ativo" : "inativo",
+      variantsText
+    ].join(" ");
+
+    return normalizeText(productText).includes(search);
   }
 
   function renderFeaturedProducts() {
@@ -977,6 +1007,14 @@
 
   function digits(valueToClean) {
     return String(valueToClean || "").replace(/\D/g, "");
+  }
+
+  function normalizeText(valueToNormalize) {
+    return String(valueToNormalize || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
   }
 
   function slugify(valueToSlug) {
