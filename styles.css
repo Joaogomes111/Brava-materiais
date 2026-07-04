@@ -1696,8 +1696,61 @@ body {
 
 .footer {
   background:
-    radial-gradient(circle at 12% 0%, rgba(7, 91, 127, 0.2), transparent 18rem),
-    #0d151e;
+    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.13), transparent 18rem),
+    linear-gradient(135deg, var(--logo-blue-dark) 0%, var(--logo-blue) 52%, #0866bd 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.footer img {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 16px 30px rgba(3, 27, 54, 0.24);
+}
+
+.footer h3 {
+  color: var(--white);
+}
+
+.footer p,
+.footer a {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.footer-link-icon,
+.footer-social-icon {
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.footer-icon-link,
+.footer-social-link,
+.footer-map a {
+  transition: color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.footer-icon-link:hover,
+.footer-social-link:hover,
+.footer-map a:hover {
+  color: var(--brand-gold);
+  transform: translateY(-1px);
+}
+
+.footer-icon-link:hover .footer-link-icon,
+.footer-social-link:hover .footer-social-icon,
+.footer-address:hover .footer-link-icon {
+  color: var(--brand-gold);
+}
+
+.footer-map {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.footer-map a {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.footer-bottom {
+  border-top-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 @media (max-width: 980px) {
