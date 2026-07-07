@@ -1,0 +1,37 @@
+﻿tipo;produto_principal;produto_duplicado;nome_final_ou_opcao
+duplicado direto;luva-plastica-descartavel-100-unidades;luva-plastica-descartavel-c-100;Luva Plástica Descartável C/100
+duplicado direto;vassoura-classica-sanches-com-cabo;vassoura-classica-sanches-cabo-de-madeira;Vassoura Clássica Sanches com Cabo
+duplicado direto;alcool-gel-pump-500ml;alcool-gel-pump-premisse-500ml;Álcool Gel Pump Premisse 500ml
+duplicado direto;papel-toalha-interfolhado-ipel;p-toalha-interf-ipel-2000-f-dupla-22-5x20-5-30g;Papel Toalha Interfolhado Ipel Folha Dupla 30g Cx com 2000
+duplicado direto;escova-sanitaria-com-suporte;escova-sanitaria-c-suporte-sanches;Escova Sanitária com Suporte Sanches
+duplicado direto;pa-jeitosa-com-cabo;pa-jeitosa-c-cabo-bettanin;Pá Jeitosa com Cabo Bettanin
+duplicado direto;refil-de-mop-umido;refil-mop-umido-cru;Refil Mop Úmido Cru
+duplicado direto;alvejante-sem-cloro-5l;alvejante-sem-cloro-spry-peroxy-5l;Alvejante Sem Cloro Spry Peroxy 5L
+duplicado direto;naftalina-30g-sany;naftalina-pacote-30g;Naftalina Pacote 30g
+duplicado direto;alcool-gel-5l-70;alcool-gel-vale-verde-5l-70;Álcool Gel Vale Verde 5L 70%
+duplicado direto;limpa-vidros-up-pro-500ml;limpa-vidro-500ml-up-nobre;Limpa Vidros UP Nobre 500ml
+duplicado direto;limpa-vidros-up-pro-5l;limpa-vidro-5l-up;Limpa Vidros UP 5L
+duplicado direto;sabonete-liquido-dove-5l;sabonete-liq-besser-dove-5l;Sabonete Líquido Besser Dove 5L
+duplicado direto;mult-espuma-desincrustante-5l;mult-espuma-desincrustante-desengord-5l-diluirm-em-1-40;Mult Espuma Desincrustante / Desengordurante 5L
+duplicado direto;fibraco-branco-leve;fibraco-leve-branco-gde-26cm;Fibraço Leve Branco GDE 26cm
+duplicado direto;pano-fraldina-para-limpeza;fralda-para-limpeza-48x58;Fralda para Limpeza 48x58
+virar opção;papel-toalha-bobina-28g-fardo-com-6-rolos;p-toalha-bobina-200m-brava-bello-28g-100-cel-cx-c-6;Brava Bello 28g 100% Cel
+virar opção;papel-toalha-bobina-28g-fardo-com-6-rolos;p-toalha-bobina-200m-brava-bello-32g-100-cel-cx-c-6;Brava Bello 32g 100% Cel
+virar opção;papel-toalha-bobina-28g-fardo-com-6-rolos;p-toalha-bobina-200m-ipel-28g-100-cel-cx-c-6;Ipel 28g 100% Cel
+virar opção;papel-toalha-bobina-28g-fardo-com-6-rolos;p-toalha-bobina-200m-premium-brava-38g-cx-c-6;Premium Brava 38g
+remover duplicado antigo;papel-toalha-bobina-28g-fardo-com-6-rolos;papel-toalha-bobina-premium-38g-fardo-com-6-rolos-200m;já coberto pelas opções
+remover duplicado antigo;papel-toalha-bobina-28g-fardo-com-6-rolos;papel-toalha-bobina-ipel-28g-fardo-com-6-rolos;já coberto pelas opções
+virar opção;touca-tnt-descartavel-100-unidades;touca-tnt-descartavel-100-unidades;TNT Descartável C/100
+virar opção;touca-tnt-descartavel-100-unidades;touca-nobre-tnt-clipada-pc-c-100un;Nobre Clipada C/100
+virar opção;touca-tnt-descartavel-100-unidades;touca-tnt-bompack-clipada-pc-c-100un;Bompack Clipada C/100
+remover duplicado antigo;copo-descartavel-180ml-agua-100-unidades;copo-180ml-dudigo-promo-com-25tr-transparente;já coberto pelas opções
+transferir opções existentes;copo-descartavel-180ml-agua-100-unidades;copo-180ml-dudigo-promo-com-25tr-transparente;opções já cadastradas serão movidas para o produto principal
+virar opção;saponaceo-cremoso-lavanda-sany-300ml;saponaceo-cremoso-lavanda-sany-300ml;Lavanda Sany
+virar opção;saponaceo-cremoso-lavanda-sany-300ml;saponaceo-cremoso-sany-floral-300ml;Floral Sany
+virar opção;saponaceo-cremoso-lavanda-sany-300ml;saponaceo-cremoso-sanybril-lavanda-300ml;Lavanda Sanybril
+virar opção;saponaceo-cremoso-lavanda-sany-300ml;saponaceo-cremoso-sanybril-cloro-300ml;Cloro Sanybril
+virar opção;saponaceo-cremoso-lavanda-sany-300ml;saponaceo-cremoso-sanybril-limao-300ml;Limão Sanybril
+virar opção;pulverizador-500ml;pulverizador-bompack-500ml;Bompack
+virar opção;pulverizador-500ml;pulverizador-profissional-500ml;Profissional
+virar opção;pulverizador-500ml;pulverizador-transparente-bettanin-500ml;Transparente Bettanin
+virar opção;pulverizador-500ml;gatilho-pulverizador-bompack-500ml;Gatilho Bompack

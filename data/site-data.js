@@ -10,7 +10,7 @@ window.BRAVA_SEED = {
     whatsappLegacyLink: "https://wa.me/message/NXZV2F4M4Z75K1",
     phone: "(47) 3348 9682",
     email: "bravamateriais@hotmail.com",
-    instagram: "https://www.instagram.com/brava_materiais_de_limpeza/",
+    instagram: "https://www.instagram.com/bravamateriais/",
     address: "Av. Osvaldo Reis, 2980 Praia Brava, Itajaí - SC",
     mapsUrl:
       "https://www.google.com/maps/place/Brava+Materiais+de+Limpeza/data=!4m2!3m1!1s0x0:0x8d3efcf983a27fcf?sa=X&ved=1t:2428&ictx=111",
