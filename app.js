@@ -4,6 +4,7 @@
     activeBanner: 0,
     bannerTimer: null,
     cart: [],
+    cartToastTimer: null,
     filters: {
       category: getQueryParam("categoria") || "todos",
       search: "",
@@ -372,6 +373,12 @@
             Enviar orçamento pelo WhatsApp
           </a>
         </aside>
+        <div class="cart-toast" data-cart-toast role="status" aria-live="polite">
+          <button class="cart-toast-close" type="button" data-cart-toast-close aria-label="Fechar aviso">x</button>
+          <strong data-cart-toast-title>Produto adicionado</strong>
+          <span data-cart-toast-text></span>
+          <button class="button secondary" type="button" data-cart-open>Ver orçamento</button>
+        </div>
       `
     );
   }
@@ -380,7 +387,13 @@
     document.addEventListener("click", (event) => {
       const openButton = event.target.closest("[data-cart-open]");
       if (openButton) {
+        hideCartToast();
         setCartOpen(true);
+        return;
+      }
+
+      if (event.target.closest("[data-cart-toast-close]")) {
+        hideCartToast();
         return;
       }
 
@@ -469,7 +482,7 @@
     if (scope.classList.contains("modal-panel")) document.querySelector("[data-modal]")?.classList.remove("open");
     saveCart();
     renderCart();
-    setCartOpen(true);
+    showCartToast(product, quantity, variant);
   }
 
   function renderCart() {
@@ -480,6 +493,7 @@
     }
 
     const quantityTotal = validItems.reduce((total, { item }) => total + normalizeQuantity(item.quantity), 0);
+    document.querySelector(".cart-fab")?.classList.toggle("visible", quantityTotal > 0);
     document.querySelectorAll("[data-cart-count]").forEach((target) => {
       target.textContent = String(quantityTotal);
     });
@@ -495,6 +509,29 @@
     }
 
     updateCartWhatsappLink();
+    if (!quantityTotal) hideCartToast();
+  }
+
+  function showCartToast(product, quantity, variant) {
+    const toast = document.querySelector("[data-cart-toast]");
+    if (!toast) return;
+
+    const optionText = variant ? ` • ${variantLabel(variant)}` : "";
+    const textTarget = toast.querySelector("[data-cart-toast-text]");
+    if (textTarget) textTarget.textContent = `${quantity}x ${product.name}${optionText}`;
+
+    toast.classList.add("open");
+    window.clearTimeout(state.cartToastTimer);
+    state.cartToastTimer = window.setTimeout(hideCartToast, 4200);
+  }
+
+  function hideCartToast() {
+    const toast = document.querySelector("[data-cart-toast]");
+    if (!toast) return;
+
+    toast.classList.remove("open");
+    window.clearTimeout(state.cartToastTimer);
+    state.cartToastTimer = null;
   }
 
   function updateCartWhatsappLink() {
