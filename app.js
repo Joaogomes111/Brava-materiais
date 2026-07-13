@@ -3,6 +3,7 @@
     data: structuredClone(window.BRAVA_SEED),
     activeBanner: 0,
     bannerTimer: null,
+    cart: [],
     filters: {
       category: getQueryParam("categoria") || "todos",
       search: "",
@@ -10,6 +11,7 @@
     }
   };
   const GOOGLE_ADS_CONTACT_CONVERSION = "AW-18269808861/l9B1CMDI8cQcEN3R3IdE";
+  const CART_STORAGE_KEY = "brava_quote_cart";
   const OFFICIAL_EMAIL = "bravamateriais@hotmail.com";
   const PRODUCT_PLACEHOLDER_IMAGE = "assets/brava-materiais-perfil-instagram.png";
   const GENERIC_PRODUCT_IMAGES = new Set([
@@ -30,8 +32,12 @@
 
   async function init() {
     state.data = await loadData();
+    state.cart = loadCart();
     renderSharedLayout();
+    renderCartShell();
     bindMobileMenu();
+    bindCartActions();
+    renderCart();
 
     const page = document.body.dataset.page;
     if (page === "home") renderHome();
@@ -331,6 +337,297 @@
       value: 1.0,
       currency: "BRL"
     });
+  }
+
+  function renderCartShell() {
+    if (document.querySelector("[data-cart-drawer]")) return;
+
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `
+        <button class="cart-fab" type="button" data-cart-open aria-label="Abrir orçamento">
+          <span>Orçamento</span>
+          <strong data-cart-count>0</strong>
+        </button>
+        <div class="cart-backdrop" data-cart-backdrop></div>
+        <aside class="cart-drawer" data-cart-drawer aria-label="Carrinho de orçamento">
+          <div class="cart-drawer-head">
+            <div>
+              <span class="eyebrow">Orçamento</span>
+              <h2>Produtos escolhidos</h2>
+              <p>Revise quantidades, opções e envie tudo direto para a Brava.</p>
+            </div>
+            <button class="cart-close" type="button" data-cart-close aria-label="Fechar carrinho">×</button>
+          </div>
+          <div class="cart-items" data-cart-items></div>
+          <label class="cart-note">
+            Observação para a Brava
+            <textarea class="textarea" data-cart-note placeholder="Ex.: entregar em condomínio, confirmar disponibilidade, melhor horário..."></textarea>
+          </label>
+          <div class="cart-summary">
+            <span data-cart-summary>0 produtos no orçamento</span>
+            <button class="button secondary" type="button" data-cart-clear>Limpar</button>
+          </div>
+          <a class="button whatsapp cart-send" data-cart-whatsapp href="${whatsappLink()}" target="_blank" rel="noreferrer">
+            Enviar orçamento pelo WhatsApp
+          </a>
+        </aside>
+      `
+    );
+  }
+
+  function bindCartActions() {
+    document.addEventListener("click", (event) => {
+      const openButton = event.target.closest("[data-cart-open]");
+      if (openButton) {
+        setCartOpen(true);
+        return;
+      }
+
+      if (event.target.closest("[data-cart-close]") || event.target.matches("[data-cart-backdrop]")) {
+        setCartOpen(false);
+        return;
+      }
+
+      const addButton = event.target.closest("[data-add-to-cart]");
+      if (addButton) {
+        addProductToCart(addButton);
+        return;
+      }
+
+      const decreaseButton = event.target.closest("[data-quantity-decrease]");
+      if (decreaseButton) {
+        adjustQuantityInput(decreaseButton, -1);
+        return;
+      }
+
+      const increaseButton = event.target.closest("[data-quantity-increase]");
+      if (increaseButton) {
+        adjustQuantityInput(increaseButton, 1);
+        return;
+      }
+
+      const removeButton = event.target.closest("[data-cart-remove]");
+      if (removeButton) {
+        removeCartItem(removeButton.dataset.cartRemove);
+        return;
+      }
+
+      const clearButton = event.target.closest("[data-cart-clear]");
+      if (clearButton) {
+        clearCart();
+      }
+    });
+
+    document.addEventListener("change", (event) => {
+      const cartQuantity = event.target.closest("[data-cart-quantity]");
+      if (cartQuantity) {
+        updateCartQuantity(cartQuantity.dataset.cartQuantity, cartQuantity.value);
+        return;
+      }
+
+      const productQuantity = event.target.closest("[data-product-quantity]");
+      if (productQuantity) productQuantity.value = normalizeQuantity(productQuantity.value);
+    });
+
+    document.addEventListener("input", (event) => {
+      if (event.target.matches("[data-cart-note]")) updateCartWhatsappLink();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setCartOpen(false);
+    });
+  }
+
+  function setCartOpen(isOpen) {
+    document.body.classList.toggle("cart-open", isOpen);
+    document.querySelector("[data-cart-drawer]")?.classList.toggle("open", isOpen);
+    document.querySelector("[data-cart-backdrop]")?.classList.toggle("open", isOpen);
+  }
+
+  function addProductToCart(button) {
+    const productId = button.dataset.addToCart;
+    const product = state.data.products.find((item) => item.id === productId);
+    if (!product) return;
+
+    const scope = button.closest(".product-card, .modal-panel") || document;
+    const variantSelect = scope.querySelector("[data-product-variant-select]");
+    const variant = variantSelect ? getProductVariant(product, variantSelect.value) : getProductVariants(product)[0] || null;
+    const quantityInput = scope.querySelector("[data-product-quantity]");
+    const quantity = normalizeQuantity(quantityInput?.value || 1);
+    const cartItem = {
+      productId: product.id,
+      variantId: variant?.id || "",
+      quantity
+    };
+    const existing = findCartItem(cartItemKey(cartItem));
+
+    if (existing) existing.quantity += quantity;
+    else state.cart.push(cartItem);
+
+    if (quantityInput) quantityInput.value = 1;
+    if (scope.classList.contains("modal-panel")) document.querySelector("[data-modal]")?.classList.remove("open");
+    saveCart();
+    renderCart();
+    setCartOpen(true);
+  }
+
+  function renderCart() {
+    const validItems = getValidCartItems();
+    if (validItems.length !== state.cart.length) {
+      state.cart = validItems.map(({ item }) => item);
+      saveCart();
+    }
+
+    const quantityTotal = validItems.reduce((total, { item }) => total + normalizeQuantity(item.quantity), 0);
+    document.querySelectorAll("[data-cart-count]").forEach((target) => {
+      target.textContent = String(quantityTotal);
+    });
+
+    const summary = document.querySelector("[data-cart-summary]");
+    if (summary) summary.textContent = quantityTotal === 1 ? "1 produto no orçamento" : `${quantityTotal} produtos no orçamento`;
+
+    const itemsTarget = document.querySelector("[data-cart-items]");
+    if (itemsTarget) {
+      itemsTarget.innerHTML = validItems.length
+        ? validItems.map(({ item, product }) => cartItemTemplate(item, product)).join("")
+        : `<div class="empty cart-empty">Nenhum produto escolhido ainda.</div>`;
+    }
+
+    updateCartWhatsappLink();
+  }
+
+  function updateCartWhatsappLink() {
+    const target = document.querySelector("[data-cart-whatsapp]");
+    if (!target) return;
+
+    const hasItems = getValidCartItems().length > 0;
+    target.href = whatsappLink(cartMessage());
+    target.classList.toggle("disabled", !hasItems);
+    target.setAttribute("aria-disabled", hasItems ? "false" : "true");
+  }
+
+  function cartItemTemplate(item, product) {
+    const variant = getCartVariant(item, product);
+    const key = cartItemKey(item);
+
+    return `
+      <article class="cart-item">
+        <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">
+        <div class="cart-item-body">
+          <strong>${escapeHtml(product.name)}</strong>
+          ${variant ? `<span>Opção: ${escapeHtml(variantLabel(variant))}</span>` : ""}
+          <div class="cart-item-actions">
+            ${quantityStepper(item.quantity, `data-cart-quantity="${escapeHtml(key)}" aria-label="Quantidade de ${escapeHtml(product.name)}"`)}
+            <button class="cart-remove" type="button" data-cart-remove="${escapeHtml(key)}">Remover</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function cartMessage() {
+    const validItems = getValidCartItems();
+    if (!validItems.length) return "Olá, gostaria de fazer um orçamento com a Brava Materiais de Limpeza.";
+
+    const lines = ["Olá, gostaria de fazer um orçamento com a Brava Materiais de Limpeza.", "", "Itens escolhidos:"];
+    validItems.forEach(({ item, product }, index) => {
+      const variant = getCartVariant(item, product);
+
+      lines.push(`${index + 1}. ${normalizeQuantity(item.quantity)}x ${product.name}`);
+      if (variant) lines.push(`   Opção: ${variantLabel(variant)}`);
+    });
+
+    const note = document.querySelector("[data-cart-note]")?.value?.trim();
+    if (note) lines.push("", `Observação: ${note}`);
+    lines.push("", "Pode confirmar disponibilidade e valores, por favor?");
+
+    return lines.join("\n");
+  }
+
+  function updateCartQuantity(key, value) {
+    const item = findCartItem(key);
+    if (!item) return;
+
+    item.quantity = normalizeQuantity(value);
+    saveCart();
+    renderCart();
+  }
+
+  function removeCartItem(key) {
+    state.cart = state.cart.filter((item) => cartItemKey(item) !== key);
+    saveCart();
+    renderCart();
+  }
+
+  function clearCart() {
+    state.cart = [];
+    saveCart();
+    renderCart();
+  }
+
+  function adjustQuantityInput(button, difference) {
+    const scope = button.closest(".quantity-stepper");
+    const input = scope?.querySelector("input");
+    if (!input) return;
+
+    input.value = Math.max(1, normalizeQuantity(input.value) + difference);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function quantityStepper(value = 1, inputAttributes = "") {
+    return `
+      <div class="quantity-stepper">
+        <button type="button" data-quantity-decrease aria-label="Diminuir quantidade">-</button>
+        <input type="number" min="1" step="1" value="${escapeHtml(normalizeQuantity(value))}" ${inputAttributes}>
+        <button type="button" data-quantity-increase aria-label="Aumentar quantidade">+</button>
+      </div>
+    `;
+  }
+
+  function loadCart() {
+    try {
+      const items = JSON.parse(window.localStorage.getItem(CART_STORAGE_KEY) || "[]");
+      if (!Array.isArray(items)) return [];
+
+      return items
+        .map((item) => ({
+          productId: String(item.productId || ""),
+          variantId: item.variantId ? String(item.variantId) : "",
+          quantity: normalizeQuantity(item.quantity)
+        }))
+        .filter((item) => item.productId);
+    } catch {
+      return [];
+    }
+  }
+
+  function saveCart() {
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
+  }
+
+  function normalizeQuantity(value) {
+    const quantity = Number.parseInt(value, 10);
+    return Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+  }
+
+  function cartItemKey(item) {
+    return `${item.productId}__${item.variantId || "sem-opcao"}`;
+  }
+
+  function findCartItem(key) {
+    return state.cart.find((item) => cartItemKey(item) === key);
+  }
+
+  function getValidCartItems() {
+    return state.cart
+      .map((item) => ({ item, product: state.data.products.find((product) => product.id === item.productId) }))
+      .filter(({ product }) => product);
+  }
+
+  function getCartVariant(item, product) {
+    if (!product || !item.variantId) return null;
+    return getProductVariant(product, item.variantId);
   }
 
   function renderHome() {
@@ -642,9 +939,10 @@
           ${variantPicker(product, selectedVariant)}
           <div class="product-footer">
             <div class="price" data-product-price-label>${escapeHtml(productPriceLabel(product, selectedVariant))}</div>
+            ${quantityStepper(1, `data-product-quantity="${escapeHtml(product.id)}" aria-label="Quantidade de ${escapeHtml(product.name)}"`)}
             <div class="product-actions">
               <button class="button secondary" type="button" data-product-detail="${escapeHtml(product.id)}">Ver detalhes</button>
-              <a class="button whatsapp" data-product-whatsapp="${escapeHtml(product.id)}" href="${productWhatsappLink(product, selectedVariant)}" target="_blank" rel="noreferrer">Pedir orçamento</a>
+              <button class="button cart-add-button" type="button" data-add-to-cart="${escapeHtml(product.id)}">Adicionar</button>
             </div>
           </div>
         </div>
@@ -700,11 +998,9 @@
             <p><strong>Código:</strong> ${escapeHtml(product.code || "Não informado")}</p>
             ${variantPicker(product, selectedVariant)}
             <p><strong>Valor:</strong> <span data-product-price-label>${escapeHtml(productPriceLabel(product, selectedVariant))}</span></p>
+            ${quantityStepper(1, `data-product-quantity="${escapeHtml(product.id)}" aria-label="Quantidade de ${escapeHtml(product.name)}"`)}
             <div class="hero-actions">
-              <a class="button whatsapp" data-product-whatsapp="${escapeHtml(product.id)}" href="${productWhatsappLink(
-                product,
-                selectedVariant
-              )}" target="_blank" rel="noreferrer">Pedir orçamento pelo WhatsApp</a>
+              <button class="button cart-add-button" type="button" data-add-to-cart="${escapeHtml(product.id)}">Adicionar ao orçamento</button>
               <button class="button secondary" type="button" data-modal-close>Fechar</button>
             </div>
           </div>
