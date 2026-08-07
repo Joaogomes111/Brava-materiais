@@ -112,6 +112,8 @@
     qs("[data-product-form]")?.addEventListener("submit", saveProduct);
     qs("[data-product-clear]")?.addEventListener("click", clearProductForm);
     qs("[data-product-search]")?.addEventListener("input", renderProducts);
+    qs("[data-product-category-filter]")?.addEventListener("change", renderProducts);
+    qs("[data-product-filter-clear]")?.addEventListener("click", clearProductFilters);
     qs("[data-featured-search]")?.addEventListener("input", renderFeaturedProducts);
     qs("[data-featured-category]")?.addEventListener("change", renderFeaturedProducts);
     qs("[data-category-form]")?.addEventListener("submit", saveCategory);
@@ -296,6 +298,17 @@
           .join("");
       featuredSelect.value = currentValue;
     }
+
+    const productCategoryFilter = qs("[data-product-category-filter]");
+    if (productCategoryFilter) {
+      const currentValue = productCategoryFilter.value;
+      productCategoryFilter.innerHTML =
+        `<option value="">Todas as categorias</option>` +
+        data.categories
+          .map((category) => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.name)}</option>`)
+          .join("");
+      productCategoryFilter.value = currentValue;
+    }
   }
 
   function renderProducts() {
@@ -303,10 +316,11 @@
     if (!target) return;
 
     const search = normalizeText(value("[data-product-search]"));
-    const filteredProducts = data.products.filter((product) => productMatchesSearch(product, search));
+    const category = value("[data-product-category-filter]");
+    const filteredProducts = data.products.filter((product) => productMatchesSearch(product, search) && productMatchesCategory(product, category));
     const countTarget = qs("[data-product-count]");
     if (countTarget) {
-      countTarget.textContent = search
+      countTarget.textContent = search || category
         ? `${filteredProducts.length} de ${data.products.length} produtos`
         : `${data.products.length} produtos`;
     }
@@ -334,10 +348,17 @@
             `
           )
           .join("")
-      : `<div class="empty">${search ? "Nenhum produto encontrado para essa busca." : "Nenhum produto cadastrado."}</div>`;
+      : `<div class="empty">${search || category ? "Nenhum produto encontrado para essa busca." : "Nenhum produto cadastrado."}</div>`;
 
     qsa("[data-edit-product]").forEach((button) => button.addEventListener("click", () => editProduct(button.dataset.editProduct)));
     qsa("[data-delete-product]").forEach((button) => button.addEventListener("click", () => deleteProduct(button.dataset.deleteProduct)));
+  }
+
+  function clearProductFilters() {
+    setValue("[data-product-search]", "");
+    setValue("[data-product-category-filter]", "");
+    renderProducts();
+    qs("[data-product-search]")?.focus();
   }
 
   function productMatchesSearch(product, search) {
@@ -358,6 +379,10 @@
     ].join(" ");
 
     return normalizeText(productText).includes(search);
+  }
+
+  function productMatchesCategory(product, categoryId) {
+    return !categoryId || productHasCategory(product, categoryId);
   }
 
   function renderFeaturedProducts() {
